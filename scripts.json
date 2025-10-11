@@ -1,1 +1,9 @@
-
+[
+    {
+        "id": 1,
+        "name": "Auto Farm", 
+        "game": "Adopt Me",
+        "description": "Automated farming script",
+        "code": "your script code here"
+    }
+]
