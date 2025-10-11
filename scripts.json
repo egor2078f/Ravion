@@ -19,5 +19,11 @@
         "game": "Ink Game",
         "description": "boren hub script",
         "code": "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/eikikrkr-ux/bypasok/refs/heads/main/ok\"))()"
-    }
+    },
+    {
+        "id": 4,
+        "name": "Create Private Server", 
+        "game": "Universal",
+        "description": "Free private server",
+        "code": "loadstring(game:HttpGet("\https://pastebin.com/raw/Ru4UQDpN\"))()"
 ]
