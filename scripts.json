@@ -26,4 +26,5 @@
         "game": "Universal",
         "description": "Free private server",
         "code": "loadstring(game:HttpGet("\https://pastebin.com/raw/Ru4UQDpN\"))()"
+    }
 ]
