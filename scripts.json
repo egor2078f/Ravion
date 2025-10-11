@@ -25,6 +25,6 @@
         "name": "Create Private Server", 
         "game": "Universal",
         "description": "Free private server",
-        "code": "loadstring(game:HttpGet("\https://pastebin.com/raw/Ru4UQDpN\"))()"
+        "code": "loadstring(game:HttpGet(\"https://pastebin.com/raw/Ru4UQDpN\"))()"
     }
 ]
