@@ -12,5 +12,12 @@
         "game": "Plants vs Brainrots",
         "description": "bloom hack script",
         "code": "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/typescript-lover123/bloom-hub/refs/heads/main/loader.lua\"))()"
+    },
+    {
+        "id": 3,
+        "name": "Boren Hub", 
+        "game": "Ink Game",
+        "description": "boren hub script",
+        "code": "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/eikikrkr-ux/bypasok/refs/heads/main/ok\"))()"
     }
 ]
