@@ -235,8 +235,8 @@
 
         .section-header {
             display: flex;
-            justify-content: between;
-            align-items: end;
+            justify-content: space-between;
+            align-items: flex-end;
             margin-bottom: 2rem;
             padding-bottom: 1rem;
             border-bottom: 1px solid var(--border);
@@ -378,6 +378,49 @@
             transform: translateY(-2px);
         }
 
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 3rem;
+        }
+
+        .page-btn {
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            min-width: 44px;
+            text-align: center;
+        }
+
+        .page-btn:hover {
+            background: var(--bg-tertiary);
+            border-color: var(--text-secondary);
+        }
+
+        .page-btn.active {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-color: var(--accent);
+        }
+
+        .page-btn.disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .page-btn.disabled:hover {
+            background: var(--bg-secondary);
+            border-color: var(--border);
+        }
+
         /* Code Modal */
         .modal {
             display: none;
@@ -474,6 +517,11 @@
             text-align: center;
             padding: 4rem 2rem;
             color: var(--text-tertiary);
+            display: none;
+        }
+
+        .no-results.active {
+            display: block;
         }
 
         .no-results-icon {
@@ -556,6 +604,10 @@
             .modal-content {
                 max-height: 90vh;
             }
+
+            .pagination {
+                flex-wrap: wrap;
+            }
         }
 
         @media (max-width: 480px) {
@@ -630,16 +682,21 @@
                         <h2 class="section-title">Available Scripts</h2>
                         <p class="section-subtitle">Click view to see code or copy to clipboard</p>
                     </div>
+                    <div class="section-info" id="pageInfo">Page 1 of 1</div>
                 </div>
 
                 <div class="scripts-grid" id="scriptsGrid">
                     <!-- Scripts will be loaded here -->
                 </div>
 
-                <div class="no-results" id="noResults" style="display: none;">
+                <div class="no-results" id="noResults">
                     <i class="fas fa-search no-results-icon"></i>
                     <h3>No Scripts Found</h3>
                     <p>Try adjusting your search terms</p>
+                </div>
+
+                <div class="pagination" id="pagination">
+                    <!-- Pagination buttons will be generated here -->
                 </div>
             </section>
         </div>
@@ -675,8 +732,6 @@
                 <div class="footer-links">
                     <a href="#" class="footer-link">Home</a>
                     <a href="#" class="footer-link">Scripts</a>
-                    <a href="#" class="footer-link">Support</a>
-                    <a href="#" class="footer-link">Contact</a>
                 </div>
                 <p>&copy; 2025 RAVION SCRIPTS. All rights reserved.</p>
             </div>
@@ -684,6 +739,12 @@
     </footer>
 
     <script>
+        // Configuration
+        const SCRIPTS_PER_PAGE = 4;
+        let currentPage = 1;
+        let currentScripts = [];
+        let filteredScripts = [];
+
         // Load scripts from JSON file
         let scriptsData = [];
 
@@ -692,12 +753,16 @@
                 const response = await fetch('scripts.json?t=' + Date.now());
                 if (response.ok) {
                     scriptsData = await response.json();
+                    currentScripts = [...scriptsData];
+                    filteredScripts = [...scriptsData];
                     updateStats();
-                    displayScripts(scriptsData);
+                    displayPage(1);
                 }
             } catch (error) {
                 console.error('Error loading scripts:', error);
                 scriptsData = [];
+                currentScripts = [];
+                filteredScripts = [];
             }
         }
 
@@ -709,7 +774,18 @@
             document.getElementById('activeGames').textContent = uniqueGames.size;
         }
 
-        // Display scripts
+        // Display scripts for specific page
+        function displayPage(page) {
+            currentPage = page;
+            const startIndex = (page - 1) * SCRIPTS_PER_PAGE;
+            const endIndex = startIndex + SCRIPTS_PER_PAGE;
+            const pageScripts = filteredScripts.slice(startIndex, endIndex);
+
+            displayScripts(pageScripts);
+            updatePagination();
+        }
+
+        // Display scripts in grid
         function displayScripts(scripts) {
             const grid = document.getElementById('scriptsGrid');
             const noResults = document.getElementById('noResults');
@@ -717,11 +793,11 @@
             grid.innerHTML = '';
 
             if (scripts.length === 0) {
-                noResults.style.display = 'block';
+                noResults.classList.add('active');
                 return;
             }
 
-            noResults.style.display = 'none';
+            noResults.classList.remove('active');
 
             scripts.forEach(script => {
                 const card = document.createElement('div');
@@ -748,6 +824,55 @@
                 `;
                 grid.appendChild(card);
             });
+        }
+
+        // Update pagination controls
+        function updatePagination() {
+            const totalPages = Math.ceil(filteredScripts.length / SCRIPTS_PER_PAGE);
+            const pagination = document.getElementById('pagination');
+            const pageInfo = document.getElementById('pageInfo');
+
+            pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
+
+            if (totalPages <= 1) {
+                pagination.innerHTML = '';
+                return;
+            }
+
+            let paginationHTML = '';
+
+            // Previous button
+            if (currentPage > 1) {
+                paginationHTML += `<button class="page-btn" onclick="displayPage(${currentPage - 1})">
+                    <i class="fas fa-chevron-left"></i>
+                </button>`;
+            } else {
+                paginationHTML += `<button class="page-btn disabled">
+                    <i class="fas fa-chevron-left"></i>
+                </button>`;
+            }
+
+            // Page numbers
+            for (let i = 1; i <= totalPages; i++) {
+                if (i === currentPage) {
+                    paginationHTML += `<button class="page-btn active">${i}</button>`;
+                } else {
+                    paginationHTML += `<button class="page-btn" onclick="displayPage(${i})">${i}</button>`;
+                }
+            }
+
+            // Next button
+            if (currentPage < totalPages) {
+                paginationHTML += `<button class="page-btn" onclick="displayPage(${currentPage + 1})">
+                    <i class="fas fa-chevron-right"></i>
+                </button>`;
+            } else {
+                paginationHTML += `<button class="page-btn disabled">
+                    <i class="fas fa-chevron-right"></i>
+                </button>`;
+            }
+
+            pagination.innerHTML = paginationHTML;
         }
 
         // View script code
@@ -807,17 +932,16 @@
             const searchTerm = e.target.value.toLowerCase().trim();
             
             if (searchTerm === '') {
-                displayScripts(scriptsData);
-                return;
+                filteredScripts = [...scriptsData];
+            } else {
+                filteredScripts = scriptsData.filter(script => 
+                    script.name.toLowerCase().includes(searchTerm) ||
+                    script.game.toLowerCase().includes(searchTerm) ||
+                    script.description.toLowerCase().includes(searchTerm)
+                );
             }
             
-            const filteredScripts = scriptsData.filter(script => 
-                script.name.toLowerCase().includes(searchTerm) ||
-                script.game.toLowerCase().includes(searchTerm) ||
-                script.description.toLowerCase().includes(searchTerm)
-            );
-            
-            displayScripts(filteredScripts);
+            displayPage(1);
         });
 
         // Initialize
