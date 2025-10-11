@@ -5,15 +5,12 @@
         "game": "Steal a Brainrot",
         "description": "lurk hack script",
         "code": "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/egor2078f/Lurk-v5/refs/heads/main/activity.lua\"))()"
-    }
-],
-[
+    },
     {
         "id": 2,
-        "name": "Bloom hub", 
+        "name": "Bloom Hub", 
         "game": "Plants vs Brainrots",
         "description": "bloom hack script",
         "code": "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/typescript-lover123/bloom-hub/refs/heads/main/loader.lua\"))()"
     }
 ]
-
