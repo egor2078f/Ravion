@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAVION SCRIPTS</title>
+    <title>RAVION | Scripts</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * {
@@ -12,684 +12,804 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: #000;
-            color: #fff;
-            line-height: 1.6;
-            min-height: 100vh;
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --accent: #ffffff;
+            --text-primary: #ffffff;
+            --text-secondary: #888888;
+            --text-tertiary: #555555;
+            --border: #222222;
+            --success: #00ff00;
         }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
+        body {
+            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Background Effects */
+        .bg-effects {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .bg-grid {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
         }
 
         /* Header */
         .header {
-            padding: 20px 0;
-            border-bottom: 1px solid #222;
-            background: #000;
-            position: sticky;
+            position: fixed;
             top: 0;
-            z-index: 100;
+            left: 0;
+            width: 100%;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            z-index: 1000;
+            padding: 1rem 0;
         }
 
-        .header-content {
+        .nav {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .logo {
-            font-size: 24px;
+            font-size: 1.5rem;
             font-weight: 700;
-            color: #fff;
+            color: var(--text-primary);
             text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
-        .logo-accent {
-            color: #fff;
-            opacity: 0.7;
+        .logo-icon {
+            color: var(--accent);
         }
 
         /* Main Content */
         .main {
-            padding: 60px 0;
-            min-height: 70vh;
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
         }
 
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        /* Hero Section */
         .hero {
             text-align: center;
-            margin-bottom: 40px;
+            padding: 6rem 0 4rem;
+            position: relative;
         }
 
         .hero-title {
-            font-size: clamp(32px, 5vw, 48px);
-            font-weight: 700;
-            margin-bottom: 16px;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
             line-height: 1.1;
         }
 
         .hero-subtitle {
-            font-size: clamp(16px, 2vw, 18px);
-            color: #888;
-            max-width: 500px;
-            margin: 0 auto;
-        }
-
-        /* Search */
-        .search-section {
+            font-size: clamp(1.1rem, 3vw, 1.5rem);
+            color: var(--text-secondary);
             max-width: 600px;
-            margin: 0 auto 40px;
+            margin: 0 auto 3rem;
+            font-weight: 400;
         }
 
-        .search-box {
+        /* Search Section */
+        .search-section {
+            max-width: 700px;
+            margin: 0 auto 4rem;
             position: relative;
         }
 
-        .search-input {
-            width: 100%;
-            padding: 16px 50px 16px 20px;
-            font-size: 16px;
-            background: #111;
-            border: 1px solid #333;
-            border-radius: 10px;
-            color: #fff;
-            outline: none;
-            transition: border-color 0.3s ease;
+        .search-container {
+            position: relative;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
         }
 
-        .search-input:focus {
-            border-color: #555;
+        .search-container:focus-within {
+            border-color: var(--text-secondary);
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
         }
 
-        .search-input::placeholder {
-            color: #666;
+        .search-label {
+            display: block;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .search-input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
         }
 
         .search-icon {
             position: absolute;
-            right: 20px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #666;
+            left: 1rem;
+            color: var(--text-tertiary);
+            font-size: 1.1rem;
         }
 
-        /* Instructions */
-        .instructions {
-            background: #111;
-            border: 1px solid #222;
-            border-radius: 10px;
-            padding: 30px;
-            margin: 40px auto;
-            max-width: 800px;
-        }
-
-        .instructions-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #fff;
-        }
-
-        .instructions-list {
-            list-style: none;
-            color: #aaa;
-        }
-
-        .instructions-list li {
-            margin-bottom: 12px;
-            padding-left: 24px;
-            position: relative;
-        }
-
-        .instructions-list li:before {
-            content: "•";
-            color: #fff;
-            position: absolute;
-            left: 8px;
-        }
-
-        /* Admin Section */
-        .admin-section {
-            background: #111;
-            border: 1px solid #222;
-            border-radius: 10px;
-            padding: 30px;
-            margin: 40px auto;
-            max-width: 800px;
-            display: none;
-        }
-
-        .admin-section.active {
-            display: block;
-        }
-
-        .admin-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #fff;
-        }
-
-        .admin-form {
-            display: flex;
-            flex-direction: column;
-            gap: 16px;
-        }
-
-        .form-group {
-            display: flex;
-            flex-direction: column;
-            gap: 8px;
-        }
-
-        .form-label {
-            color: #aaa;
-            font-size: 14px;
-            font-weight: 500;
-        }
-
-        .form-input, .form-textarea {
-            padding: 12px 16px;
-            background: #000;
-            border: 1px solid #333;
-            border-radius: 6px;
-            color: #fff;
-            font-size: 14px;
+        .search-input {
+            width: 100%;
+            padding: 1rem 1rem 1rem 3rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 1.1rem;
             outline: none;
-            transition: border-color 0.3s ease;
-        }
-
-        .form-input:focus, .form-textarea:focus {
-            border-color: #555;
-        }
-
-        .form-textarea {
-            resize: vertical;
-            min-height: 120px;
-            font-family: 'Courier New', monospace;
-        }
-
-        .form-actions {
-            display: flex;
-            gap: 12px;
-            margin-top: 10px;
-        }
-
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 6px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
             transition: all 0.3s ease;
         }
 
-        .btn-primary {
-            background: #fff;
-            color: #000;
+        .search-input:focus {
+            border-color: var(--text-secondary);
         }
 
-        .btn-primary:hover {
-            background: #e0e0e0;
+        .search-input::placeholder {
+            color: var(--text-tertiary);
         }
 
-        .btn-secondary {
-            background: #333;
-            color: #fff;
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            margin: 4rem 0;
         }
 
-        .btn-secondary:hover {
-            background: #444;
+        .stat-card {
+            text-align: center;
+            padding: 2rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            transition: transform 0.3s ease;
         }
 
-        /* Results */
-        .results-section {
-            display: none;
+        .stat-card:hover {
+            transform: translateY(-5px);
         }
 
-        .results-section.active {
-            display: block;
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Scripts Section */
+        .scripts-section {
+            margin: 4rem 0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: between;
+            align-items: end;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
         }
 
         .section-title {
-            font-size: 20px;
-            font-weight: 600;
-            margin-bottom: 20px;
-            color: #fff;
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .section-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
         }
 
         .scripts-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 16px;
-            margin-bottom: 30px;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 3rem;
         }
 
-        .script-item {
-            background: #111;
-            border: 1px solid #222;
-            border-radius: 8px;
-            padding: 20px;
-            transition: border-color 0.3s ease;
+        .script-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 2rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
         }
 
-        .script-item:hover {
-            border-color: #333;
+        .script-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.02), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .script-card:hover::before {
+            left: 100%;
+        }
+
+        .script-card:hover {
+            border-color: var(--text-secondary);
+            transform: translateY(-5px);
         }
 
         .script-header {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 12px;
+            margin-bottom: 1rem;
         }
 
-        .script-name {
-            font-size: 16px;
-            font-weight: 600;
-            color: #fff;
+        .script-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
         }
 
         .script-game {
-            color: #888;
-            font-size: 12px;
-            margin-bottom: 8px;
+            color: var(--accent);
+            font-size: 0.9rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .script-badge {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
         }
 
         .script-description {
-            color: #aaa;
-            font-size: 13px;
-            line-height: 1.5;
-            margin-bottom: 15px;
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1.5rem;
         }
 
         .script-actions {
             display: flex;
-            gap: 8px;
+            gap: 0.75rem;
         }
 
-        .action-btn {
-            padding: 8px 16px;
-            background: #222;
-            border: 1px solid #333;
-            border-radius: 6px;
-            color: #fff;
-            font-size: 12px;
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: all 0.3s ease;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 0.5rem;
+            text-decoration: none;
         }
 
-        .action-btn:hover {
-            background: #333;
+        .btn-primary {
+            background: var(--accent);
+            color: var(--bg-primary);
         }
 
-        .action-btn.copy {
-            background: #1a1a1a;
+        .btn-primary:hover {
+            background: #e0e0e0;
+            transform: translateY(-2px);
         }
 
-        .action-btn.copy.copied {
-            background: #003300;
-            color: #00ff00;
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border);
         }
 
-        /* Code Display */
-        .code-display {
-            background: #111;
-            border: 1px solid #222;
-            border-radius: 8px;
-            padding: 20px;
-            margin-top: 20px;
+        .btn-secondary:hover {
+            background: var(--border);
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--bg-primary);
+        }
+
+        .btn-success:hover {
+            background: #00cc00;
+            transform: translateY(-2px);
+        }
+
+        /* Code Modal */
+        .modal {
             display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
         }
 
-        .code-display.active {
-            display: block;
+        .modal.active {
+            display: flex;
         }
 
-        .code-header {
+        .modal-content {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            width: 100%;
+            max-width: 800px;
+            max-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .modal-header {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
         }
 
-        .code-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #fff;
+        .modal-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-primary);
         }
 
-        .close-code {
+        .modal-close {
             background: none;
             border: none;
-            color: #888;
-            font-size: 18px;
+            color: var(--text-secondary);
+            font-size: 1.5rem;
             cursor: pointer;
-            padding: 5px;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
         }
 
-        .code-content {
-            font-family: 'Courier New', monospace;
-            font-size: 13px;
-            color: #ccc;
+        .modal-close:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .modal-body {
+            padding: 2rem;
+            overflow-y: auto;
+            flex-grow: 1;
+        }
+
+        .code-block {
+            background: var(--bg-primary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+            color: var(--text-primary);
             white-space: pre-wrap;
             word-break: break-all;
-            line-height: 1.4;
-            background: #000;
-            padding: 16px;
-            border-radius: 6px;
-            border: 1px solid #222;
             max-height: 400px;
             overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 1.5rem 2rem;
+            border-top: 1px solid var(--border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 1rem;
         }
 
         /* No Results */
         .no-results {
             text-align: center;
-            padding: 40px 20px;
-            color: #666;
-            display: none;
+            padding: 4rem 2rem;
+            color: var(--text-tertiary);
         }
 
-        .no-results.active {
-            display: block;
+        .no-results-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.5;
         }
 
         /* Footer */
         .footer {
-            border-top: 1px solid #222;
-            padding: 30px 0;
-            margin-top: 60px;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border);
+            padding: 3rem 0;
+            margin-top: 4rem;
         }
 
         .footer-content {
             text-align: center;
-            color: #666;
-            font-size: 14px;
+            color: var(--text-secondary);
         }
 
-        /* Protection */
-        .protection {
-            display: none;
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-link {
+            color: var(--text-secondary);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-link:hover {
+            color: var(--text-primary);
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .header-content {
-                flex-direction: column;
-                gap: 15px;
+            .nav {
+                padding: 0 1rem;
             }
 
-            .main {
-                padding: 40px 0;
+            .container {
+                padding: 0 1rem;
+            }
+
+            .hero {
+                padding: 4rem 0 2rem;
             }
 
             .scripts-grid {
                 grid-template-columns: 1fr;
             }
 
-            .instructions, .admin-section {
-                margin: 20px auto;
-                padding: 20px;
+            .stats {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 1rem;
             }
 
-            .form-actions {
+            .stat-card {
+                padding: 1.5rem;
+            }
+
+            .section-header {
                 flex-direction: column;
+                align-items: flex-start;
+                gap: 1rem;
+            }
+
+            .script-actions {
+                flex-direction: column;
+            }
+
+            .modal {
+                padding: 1rem;
+            }
+
+            .modal-content {
+                max-height: 90vh;
             }
         }
 
         @media (max-width: 480px) {
-            .container {
-                padding: 0 15px;
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-links {
+                flex-direction: column;
+                gap: 1rem;
             }
 
             .hero-title {
-                font-size: 28px;
-            }
-
-            .script-item {
-                padding: 15px;
+                font-size: 2.5rem;
             }
         }
     </style>
 </head>
 <body>
-    <div class="protection" id="protection"></div>
+    <div class="bg-effects">
+        <div class="bg-grid"></div>
+    </div>
 
     <header class="header">
-        <div class="container">
-            <div class="header-content">
-                <a href="#" class="logo">RAVION<span class="logo-accent">SCRIPTS</span></a>
-            </div>
-        </div>
+        <nav class="nav">
+            <a href="#" class="logo">
+                <i class="fas fa-code logo-icon"></i>
+                RAVION
+            </a>
+        </nav>
     </header>
 
     <main class="main">
         <div class="container">
             <section class="hero">
-                <h1 class="hero-title">ROBLOX SCRIPTS</h1>
-                <p class="hero-subtitle">Search and copy scripts for Roblox games</p>
+                <h1 class="hero-title">RAVION SCRIPTS</h1>
+                <p class="hero-subtitle">Premium Roblox scripts for enhanced gaming experience</p>
             </section>
 
             <section class="search-section">
-                <div class="search-box">
-                    <input type="text" class="search-input" placeholder="Search scripts by name, game, or description...">
-                    <i class="fas fa-search search-icon"></i>
+                <div class="search-container">
+                    <label class="search-label">Search Scripts</label>
+                    <div class="search-input-wrapper">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" class="search-input" placeholder="Type to search scripts by name, game, or description..." id="searchInput">
+                    </div>
                 </div>
             </section>
 
-            <section class="instructions">
-                <h3 class="instructions-title">How to Use</h3>
-                <ul class="instructions-list">
-                    <li>Use the search bar above to find scripts</li>
-                    <li>Click "View Code" to see the script</li>
-                    <li>Click "Copy" to copy the script to clipboard</li>
-                    <li>Use in your Roblox executor</li>
-                </ul>
+            <section class="stats">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalScripts">0</div>
+                    <div class="stat-label">Total Scripts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="activeGames">0</div>
+                    <div class="stat-label">Games Supported</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">24/7</div>
+                    <div class="stat-label">Uptime</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">100%</div>
+                    <div class="stat-label">Safe</div>
+                </div>
             </section>
 
-            <section class="admin-section" id="adminSection">
-                <h3 class="admin-title">Add New Script</h3>
-                <form class="admin-form" id="scriptForm">
-                    <div class="form-group">
-                        <label class="form-label">Script Name</label>
-                        <input type="text" class="form-input" id="scriptName" required>
+            <section class="scripts-section">
+                <div class="section-header">
+                    <div>
+                        <h2 class="section-title">Available Scripts</h2>
+                        <p class="section-subtitle">Click view to see code or copy to clipboard</p>
                     </div>
-                    <div class="form-group">
-                        <label class="form-label">Game</label>
-                        <input type="text" class="form-input" id="scriptGame" required>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Description</label>
-                        <textarea class="form-input" id="scriptDescription" required></textarea>
-                    </div>
-                    <div class="form-group">
-                        <label class="form-label">Script Code</label>
-                        <textarea class="form-textarea" id="scriptCode" required></textarea>
-                    </div>
-                    <div class="form-actions">
-                        <button type="submit" class="btn btn-primary">Add Script</button>
-                        <button type="button" class="btn btn-secondary" onclick="hideAdmin()">Cancel</button>
-                    </div>
-                </form>
-            </section>
+                </div>
 
-            <section class="results-section" id="resultsSection">
-                <h3 class="section-title">Search Results</h3>
                 <div class="scripts-grid" id="scriptsGrid">
                     <!-- Scripts will be loaded here -->
                 </div>
-                <div class="no-results" id="noResults">
-                    <i class="fas fa-search" style="font-size: 48px; margin-bottom: 16px; opacity: 0.5;"></i>
-                    <p>No scripts found. Try different search terms.</p>
+
+                <div class="no-results" id="noResults" style="display: none;">
+                    <i class="fas fa-search no-results-icon"></i>
+                    <h3>No Scripts Found</h3>
+                    <p>Try adjusting your search terms</p>
                 </div>
             </section>
-
-            <div class="code-display" id="codeDisplay">
-                <div class="code-header">
-                    <div class="code-title" id="codeTitle">Script Code</div>
-                    <button class="close-code" onclick="closeCode()">×</button>
-                </div>
-                <pre class="code-content" id="codeContent"></pre>
-            </div>
         </div>
     </main>
+
+    <!-- Code Modal -->
+    <div class="modal" id="codeModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalTitle">Script Code</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <pre class="code-block" id="modalCode"></pre>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="copyCodeBtn">
+                    <i class="fas fa-copy"></i>
+                    Copy Code
+                </button>
+                <button class="btn btn-primary" id="closeModalBtn">
+                    Close
+                </button>
+            </div>
+        </div>
+    </div>
 
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
-                <p>&copy; 2024 RAVION SCRIPTS. All rights reserved.</p>
+                <div class="footer-links">
+                    <a href="#" class="footer-link">Home</a>
+                    <a href="#" class="footer-link">Scripts</a>
+                    <a href="#" class="footer-link">Support</a>
+                    <a href="#" class="footer-link">Contact</a>
+                </div>
+                <p>&copy; 2025 RAVION SCRIPTS. All rights reserved.</p>
             </div>
         </div>
     </footer>
 
     <script>
-        // Protection against bots and spam
-        function initProtection() {
-            const protection = document.getElementById('protection');
-            
-            // Block common bot user agents
-            const botUserAgents = [
-                'bot', 'crawler', 'spider', 'scraper', 'curl', 'wget', 
-                'python', 'java', 'php', 'ruby', 'go-http'
-            ];
-            
-            const userAgent = navigator.userAgent.toLowerCase();
-            const isBot = botUserAgents.some(agent => userAgent.includes(agent));
-            
-            if (isBot) {
-                protection.innerHTML = 'Access denied';
-                document.body.innerHTML = '<h1>Access Denied</h1>';
-                return false;
-            }
-            
-            return true;
-        }
-
-        // Initialize protection
-        if (!initProtection()) {
-            throw new Error('Protection activated');
-        }
-
-        // Sample scripts data - This will be loaded from external file
+        // Load scripts from JSON file
         let scriptsData = [];
 
-        // Load scripts from external file
         async function loadScripts() {
             try {
-                const response = await fetch('scripts.json');
+                const response = await fetch('scripts.json?t=' + Date.now());
                 if (response.ok) {
                     scriptsData = await response.json();
-                } else {
-                    // Fallback to empty array if file doesn't exist
-                    scriptsData = [];
+                    updateStats();
+                    displayScripts(scriptsData);
                 }
             } catch (error) {
-                console.log('No external scripts file found, using empty array');
+                console.error('Error loading scripts:', error);
                 scriptsData = [];
             }
         }
 
-        // DOM elements
-        const scriptsGrid = document.getElementById('scriptsGrid');
-        const noResults = document.getElementById('noResults');
-        const searchInput = document.querySelector('.search-input');
-        const codeDisplay = document.getElementById('codeDisplay');
-        const codeContent = document.getElementById('codeContent');
-        const codeTitle = document.getElementById('codeTitle');
-        const resultsSection = document.getElementById('resultsSection');
-        const adminSection = document.getElementById('adminSection');
-        const scriptForm = document.getElementById('scriptForm');
+        // Update statistics
+        function updateStats() {
+            document.getElementById('totalScripts').textContent = scriptsData.length;
+            
+            const uniqueGames = new Set(scriptsData.map(script => script.game));
+            document.getElementById('activeGames').textContent = uniqueGames.size;
+        }
 
         // Display scripts
         function displayScripts(scripts) {
-            scriptsGrid.innerHTML = '';
-            
+            const grid = document.getElementById('scriptsGrid');
+            const noResults = document.getElementById('noResults');
+
+            grid.innerHTML = '';
+
             if (scripts.length === 0) {
-                noResults.classList.add('active');
+                noResults.style.display = 'block';
                 return;
             }
-            
-            noResults.classList.remove('active');
-            
+
+            noResults.style.display = 'none';
+
             scripts.forEach(script => {
-                const scriptElement = document.createElement('div');
-                scriptElement.className = 'script-item';
-                scriptElement.innerHTML = `
+                const card = document.createElement('div');
+                card.className = 'script-card';
+                card.innerHTML = `
                     <div class="script-header">
-                        <div class="script-name">${script.name}</div>
+                        <div>
+                            <h3 class="script-title">${script.name}</h3>
+                            <div class="script-game">${script.game}</div>
+                        </div>
+                        <span class="script-badge">#${script.id}</span>
                     </div>
-                    <div class="script-game">${script.game}</div>
-                    <div class="script-description">${script.description}</div>
+                    <p class="script-description">${script.description}</p>
                     <div class="script-actions">
-                        <button class="action-btn" onclick="showCode(${script.id})">
-                            <i class="fas fa-eye"></i>View Code
+                        <button class="btn btn-primary" onclick="viewScript(${script.id})">
+                            <i class="fas fa-eye"></i>
+                            View Code
                         </button>
-                        <button class="action-btn copy" onclick="copyToClipboard(${script.id})">
-                            <i class="fas fa-copy"></i>Copy
+                        <button class="btn btn-secondary" onclick="copyScript(${script.id})">
+                            <i class="fas fa-copy"></i>
+                            Copy
                         </button>
                     </div>
                 `;
-                scriptsGrid.appendChild(scriptElement);
+                grid.appendChild(card);
             });
         }
 
-        // Show code
-        function showCode(scriptId) {
+        // View script code
+        function viewScript(scriptId) {
             const script = scriptsData.find(s => s.id === scriptId);
             if (script) {
-                codeTitle.textContent = `${script.name} - ${script.game}`;
-                codeContent.textContent = script.code;
-                codeDisplay.classList.add('active');
+                document.getElementById('modalTitle').textContent = `${script.name} - ${script.game}`;
+                document.getElementById('modalCode').textContent = script.code;
+                document.getElementById('codeModal').classList.add('active');
                 
-                // Scroll to code
-                codeDisplay.scrollIntoView({ behavior: 'smooth' });
+                // Store current script ID for copy function
+                document.getElementById('copyCodeBtn').setAttribute('data-script-id', scriptId);
             }
         }
 
-        // Copy to clipboard
-        function copyToClipboard(scriptId) {
+        // Copy script to clipboard
+        function copyScript(scriptId) {
             const script = scriptsData.find(s => s.id === scriptId);
             if (script) {
                 navigator.clipboard.writeText(script.code).then(() => {
-                    const btn = event.target.closest('.action-btn');
+                    const btn = event.target;
                     const originalHTML = btn.innerHTML;
                     btn.innerHTML = '<i class="fas fa-check"></i>Copied!';
-                    btn.classList.add('copied');
+                    btn.className = 'btn btn-success';
                     
                     setTimeout(() => {
                         btn.innerHTML = originalHTML;
-                        btn.classList.remove('copied');
+                        btn.className = 'btn btn-secondary';
                     }, 2000);
-                }).catch(err => {
-                    console.error('Failed to copy: ', err);
                 });
             }
         }
 
-        // Close code display
-        function closeCode() {
-            codeDisplay.classList.remove('active');
+        // Modal functionality
+        document.getElementById('modalClose').addEventListener('click', closeModal);
+        document.getElementById('closeModalBtn').addEventListener('click', closeModal);
+        document.getElementById('copyCodeBtn').addEventListener('click', function() {
+            const scriptId = this.getAttribute('data-script-id');
+            if (scriptId) {
+                copyScript(parseInt(scriptId));
+            }
+        });
+
+        function closeModal() {
+            document.getElementById('codeModal').classList.remove('active');
         }
 
+        // Close modal on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeModal();
+            }
+        });
+
         // Search functionality
-        searchInput.addEventListener('input', function(e) {
+        document.getElementById('searchInput').addEventListener('input', function(e) {
             const searchTerm = e.target.value.toLowerCase().trim();
             
             if (searchTerm === '') {
-                resultsSection.classList.remove('active');
+                displayScripts(scriptsData);
                 return;
             }
-            
-            resultsSection.classList.add('active');
             
             const filteredScripts = scriptsData.filter(script => 
                 script.name.toLowerCase().includes(searchTerm) ||
@@ -700,63 +820,8 @@
             displayScripts(filteredScripts);
         });
 
-        // Admin functions
-        function showAdmin() {
-            adminSection.classList.add('active');
-        }
-
-        function hideAdmin() {
-            adminSection.classList.remove('active');
-            scriptForm.reset();
-        }
-
-        // Add new script
-        scriptForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const newScript = {
-                id: Date.now(), // Simple ID generation
-                name: document.getElementById('scriptName').value,
-                game: document.getElementById('scriptGame').value,
-                description: document.getElementById('scriptDescription').value,
-                code: document.getElementById('scriptCode').value
-            };
-            
-            scriptsData.push(newScript);
-            hideAdmin();
-            
-            // In real implementation, you would save to scripts.json here
-            console.log('New script added:', newScript);
-            alert('Script added! In production, this would save to scripts.json');
-        });
-
         // Initialize
-        loadScripts().then(() => {
-            // Show admin panel if URL has admin parameter
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.has('admin')) {
-                showAdmin();
-            }
-        });
-
-        // Close code on escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeCode();
-            }
-        });
-
-        // Protection against right-click
-        document.addEventListener('contextmenu', function(e) {
-            e.preventDefault();
-        });
-
-        // Protection against F12
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'F12') {
-                e.preventDefault();
-            }
-        });
+        loadScripts();
     </script>
 </body>
 </html>
