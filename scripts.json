@@ -1,9 +1,9 @@
 [
     {
         "id": 1,
-        "name": "Auto Farm", 
-        "game": "Adopt Me",
-        "description": "Automated farming script",
-        "code": "your script code here"
+        "name": "Lurk Hack V5", 
+        "game": "Steal a Brainrot",
+        "description": lurk hack script",
+        "code": "loadstring(game:HttpGet("https://raw.githubusercontent.com/egor2078f/Lurk-v5/refs/heads/main/activity.lua"))()"
     }
 ]
