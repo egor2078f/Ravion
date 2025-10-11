@@ -3,7 +3,7 @@
         "id": 1,
         "name": "Lurk Hack V5", 
         "game": "Steal a Brainrot",
-        "description": lurk hack script",
+        "description": "lurk hack script",
         "code": "loadstring(game:HttpGet("https://raw.githubusercontent.com/egor2078f/Lurk-v5/refs/heads/main/activity.lua"))()"
     }
 ]
