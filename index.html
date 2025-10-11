@@ -22,6 +22,7 @@
             --text-tertiary: #555555;
             --border: #222222;
             --success: #00ff00;
+            --universal: #ff6b00;
         }
 
         body {
@@ -193,6 +194,47 @@
             color: var(--text-tertiary);
         }
 
+        /* Category Filter */
+        .category-filter {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .category-btn {
+            padding: 0.75rem 1.5rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 25px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .category-btn:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .category-btn.active {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-color: var(--accent);
+        }
+
+        .category-btn.universal {
+            border-color: var(--universal);
+        }
+
+        .category-btn.universal.active {
+            background: var(--universal);
+            color: var(--bg-primary);
+        }
+
         /* Stats */
         .stats {
             display: grid;
@@ -270,6 +312,10 @@
             overflow: hidden;
         }
 
+        .script-card.universal {
+            border-color: var(--universal);
+        }
+
         .script-card::before {
             content: '';
             position: absolute;
@@ -281,6 +327,10 @@
             transition: left 0.6s ease;
         }
 
+        .script-card.universal::before {
+            background: linear-gradient(90deg, transparent, rgba(255,107,0,0.05), transparent);
+        }
+
         .script-card:hover::before {
             left: 100%;
         }
@@ -288,6 +338,10 @@
         .script-card:hover {
             border-color: var(--text-secondary);
             transform: translateY(-5px);
+        }
+
+        .script-card.universal:hover {
+            border-color: var(--universal);
         }
 
         .script-header {
@@ -312,6 +366,10 @@
             letter-spacing: 0.5px;
         }
 
+        .script-card.universal .script-game {
+            color: var(--universal);
+        }
+
         .script-badge {
             background: var(--bg-tertiary);
             color: var(--text-secondary);
@@ -319,6 +377,11 @@
             border-radius: 20px;
             font-size: 0.8rem;
             font-weight: 600;
+        }
+
+        .script-card.universal .script-badge {
+            background: var(--universal);
+            color: var(--bg-primary);
         }
 
         .script-description {
@@ -608,6 +671,15 @@
             .pagination {
                 flex-wrap: wrap;
             }
+
+            .category-filter {
+                gap: 0.5rem;
+            }
+
+            .category-btn {
+                padding: 0.6rem 1rem;
+                font-size: 0.8rem;
+            }
         }
 
         @media (max-width: 480px) {
@@ -657,18 +729,24 @@
                 </div>
             </section>
 
+            <div class="category-filter" id="categoryFilter">
+                <button class="category-btn active" data-category="all">All Scripts</button>
+                <button class="category-btn" data-category="universal">Universal</button>
+                <button class="category-btn" data-category="game">Game Specific</button>
+            </div>
+
             <section class="stats">
                 <div class="stat-card">
                     <div class="stat-number" id="totalScripts">0</div>
                     <div class="stat-label">Total Scripts</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number" id="activeGames">0</div>
-                    <div class="stat-label">Games Supported</div>
+                    <div class="stat-number" id="universalScripts">0</div>
+                    <div class="stat-label">Universal</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">24/7</div>
-                    <div class="stat-label">Uptime</div>
+                    <div class="stat-number" id="gameScripts">0</div>
+                    <div class="stat-label">Game Specific</div>
                 </div>
                 <div class="stat-card">
                     <div class="stat-number">100%</div>
@@ -692,7 +770,7 @@
                 <div class="no-results" id="noResults">
                     <i class="fas fa-search no-results-icon"></i>
                     <h3>No Scripts Found</h3>
-                    <p>Try adjusting your search terms</p>
+                    <p>Try adjusting your search terms or category filter</p>
                 </div>
 
                 <div class="pagination" id="pagination">
@@ -742,6 +820,7 @@
         // Configuration
         const SCRIPTS_PER_PAGE = 4;
         let currentPage = 1;
+        let currentCategory = 'all';
         let currentScripts = [];
         let filteredScripts = [];
 
@@ -770,8 +849,26 @@
         function updateStats() {
             document.getElementById('totalScripts').textContent = scriptsData.length;
             
-            const uniqueGames = new Set(scriptsData.map(script => script.game));
-            document.getElementById('activeGames').textContent = uniqueGames.size;
+            const universalScripts = scriptsData.filter(script => script.type === 'universal').length;
+            const gameScripts = scriptsData.filter(script => script.type !== 'universal').length;
+            
+            document.getElementById('universalScripts').textContent = universalScripts;
+            document.getElementById('gameScripts').textContent = gameScripts;
+        }
+
+        // Filter scripts by category
+        function filterScripts(category) {
+            currentCategory = category;
+            
+            if (category === 'all') {
+                filteredScripts = [...currentScripts];
+            } else if (category === 'universal') {
+                filteredScripts = currentScripts.filter(script => script.type === 'universal');
+            } else if (category === 'game') {
+                filteredScripts = currentScripts.filter(script => script.type !== 'universal');
+            }
+            
+            displayPage(1);
         }
 
         // Display scripts for specific page
@@ -800,13 +897,14 @@
             noResults.classList.remove('active');
 
             scripts.forEach(script => {
+                const isUniversal = script.type === 'universal';
                 const card = document.createElement('div');
-                card.className = 'script-card';
+                card.className = `script-card ${isUniversal ? 'universal' : ''}`;
                 card.innerHTML = `
                     <div class="script-header">
                         <div>
                             <h3 class="script-title">${script.name}</h3>
-                            <div class="script-game">${script.game}</div>
+                            <div class="script-game">${isUniversal ? 'Universal Script' : script.game}</div>
                         </div>
                         <span class="script-badge">#${script.id}</span>
                     </div>
@@ -879,7 +977,8 @@
         function viewScript(scriptId) {
             const script = scriptsData.find(s => s.id === scriptId);
             if (script) {
-                document.getElementById('modalTitle').textContent = `${script.name} - ${script.game}`;
+                const isUniversal = script.type === 'universal';
+                document.getElementById('modalTitle').textContent = `${script.name} - ${isUniversal ? 'Universal Script' : script.game}`;
                 document.getElementById('modalCode').textContent = script.code;
                 document.getElementById('codeModal').classList.add('active');
                 
@@ -932,16 +1031,33 @@
             const searchTerm = e.target.value.toLowerCase().trim();
             
             if (searchTerm === '') {
-                filteredScripts = [...scriptsData];
+                currentScripts = [...scriptsData];
             } else {
-                filteredScripts = scriptsData.filter(script => 
+                currentScripts = scriptsData.filter(script => 
                     script.name.toLowerCase().includes(searchTerm) ||
-                    script.game.toLowerCase().includes(searchTerm) ||
+                    (script.game && script.game.toLowerCase().includes(searchTerm)) ||
                     script.description.toLowerCase().includes(searchTerm)
                 );
             }
             
-            displayPage(1);
+            filterScripts(currentCategory);
+        });
+
+        // Category filter functionality
+        document.getElementById('categoryFilter').addEventListener('click', function(e) {
+            if (e.target.classList.contains('category-btn')) {
+                // Remove active class from all buttons
+                document.querySelectorAll('.category-btn').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Add active class to clicked button
+                e.target.classList.add('active');
+                
+                // Filter scripts
+                const category = e.target.getAttribute('data-category');
+                filterScripts(category);
+            }
         });
 
         // Initialize
