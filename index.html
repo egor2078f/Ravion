@@ -13,7 +13,7 @@
 
         body {
             font-family: 'Arial', sans-serif;
-            background-color: #121212;
+            background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
             color: #e0e0e0;
             line-height: 1.6;
             min-height: 100vh;
@@ -24,46 +24,60 @@
         }
 
         .container {
-            max-width: 400px;
+            max-width: 380px;
             width: 100%;
-            background: #1e1e1e;
-            border-radius: 20px;
-            padding: 40px 30px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            background: #1a1a1a;
+            border-radius: 16px;
+            padding: 35px 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
             text-align: center;
-            border: 1px solid #333;
+            border: 1px solid #2a2a2a;
+            backdrop-filter: blur(10px);
         }
 
         .avatar {
-            width: 120px;
-            height: 120px;
+            width: 110px;
+            height: 110px;
             border-radius: 50%;
             object-fit: cover;
-            border: 4px solid #2d5a27;
-            margin: 0 auto 20px;
+            border: 3px solid #1a3d1a;
+            margin: 0 auto 15px;
             display: block;
+            transition: transform 0.3s ease;
+        }
+
+        .avatar:hover {
+            transform: scale(1.05);
         }
 
         .name {
-            font-size: 28px;
-            font-weight: bold;
-            margin-bottom: 10px;
+            font-size: 26px;
+            font-weight: 600;
+            margin-bottom: 8px;
             color: #ffffff;
+            letter-spacing: 0.5px;
+        }
+
+        .tag {
+            color: #4d774d;
+            font-size: 14px;
+            margin-bottom: 20px;
+            font-weight: 500;
         }
 
         .info-section {
-            background: #252525;
+            background: #222222;
             border-radius: 12px;
-            padding: 20px;
-            margin: 25px 0;
-            border: 1px solid #333;
+            padding: 18px;
+            margin: 20px 0;
+            border: 1px solid #2d2d2d;
         }
 
         .info-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
+            padding: 10px 0;
             border-bottom: 1px solid #333;
         }
 
@@ -72,29 +86,31 @@
         }
 
         .info-label {
-            color: #888;
-            font-size: 14px;
+            color: #999;
+            font-size: 13px;
+            font-weight: 500;
         }
 
         .info-value {
-            color: #4CAF50;
+            color: #3d5a3d;
             font-weight: 500;
+            font-size: 14px;
         }
 
         .buttons {
             display: flex;
             flex-direction: column;
-            gap: 12px;
-            margin-top: 30px;
+            gap: 10px;
+            margin-top: 25px;
         }
 
         .btn {
-            background: #2d5a27;
-            color: white;
+            background: #1a3d1a;
+            color: #e8f5e8;
             border: none;
-            padding: 14px 24px;
+            padding: 13px 20px;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 500;
             cursor: pointer;
             transition: all 0.3s ease;
@@ -103,55 +119,98 @@
             align-items: center;
             justify-content: center;
             gap: 8px;
+            position: relative;
+            overflow: hidden;
         }
 
         .btn:hover {
-            background: #3a6b34;
+            background: #2a4d2a;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.2);
+            box-shadow: 0 6px 20px rgba(26, 61, 26, 0.3);
         }
 
         .btn:active {
             transform: translateY(0);
         }
 
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn:hover::before {
+            left: 100%;
+        }
+
         .btn-secondary {
             background: transparent;
-            border: 2px solid #2d5a27;
-            color: #4CAF50;
+            border: 1.5px solid #1a3d1a;
+            color: #4d774d;
         }
 
         .btn-secondary:hover {
-            background: rgba(45, 90, 39, 0.1);
+            background: rgba(26, 61, 26, 0.1);
         }
 
         .icon {
+            width: 16px;
+            height: 16px;
+        }
+
+        .telegram-icon {
             width: 18px;
             height: 18px;
         }
 
+        .social-links {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #2a2a2a;
+        }
+
+        .social-icon {
+            width: 20px;
+            height: 20px;
+            color: #4d774d;
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            color: #5c8a5c;
+            transform: scale(1.1);
+        }
+
         @media (max-width: 480px) {
             .container {
-                padding: 30px 20px;
+                padding: 25px 20px;
             }
             
             .avatar {
-                width: 100px;
-                height: 100px;
+                width: 95px;
+                height: 95px;
             }
             
             .name {
-                font-size: 24px;
+                font-size: 22px;
             }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <!-- Исправленный путь к аватарке -->
         <img src="IMG_20251011_211447_247.jpg" alt="Аватар" class="avatar">
         
         <h1 class="name">LURK</h1>
+        <div class="tag">@LurkO1</div>
         
         <div class="info-section">
             <div class="info-item">
@@ -169,15 +228,13 @@
         </div>
 
         <div class="buttons">
-            <button class="btn">
-                <svg class="icon" viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+            <a href="https://t.me/LurkO1" class="btn" target="_blank">
+                <svg class="telegram-icon" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.98-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69.01-.03.01-.14-.07-.2-.08-.06-.19-.04-.27-.02-.12.02-1.95 1.24-5.51 3.64-.52.36-1 .53-1.43.52-.47-.01-1.38-.27-2.06-.49-.83-.27-1.5-.42-1.44-.89.03-.24.27-.49.75-.75 2.9-1.26 4.84-2.1 5.83-2.51 2.78-1.15 3.36-1.35 3.74-1.35.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0z"/>
                 </svg>
-                Написать мне
-            </button>
+                Написать в Telegram
+            </a>
         </div>
-    </div>
-
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const buttons = document.querySelectorAll('.btn');
@@ -190,6 +247,19 @@
                 button.addEventListener('mouseleave', function() {
                     this.style.transition = 'all 0.3s ease';
                 });
+            });
+
+            // Плавное появление элементов
+            const elements = document.querySelectorAll('.container > *');
+            elements.forEach((element, index) => {
+                element.style.opacity = '0';
+                element.style.transform = 'translateY(20px)';
+                element.style.transition = `all 0.5s ease ${index * 0.1}s`;
+                
+                setTimeout(() => {
+                    element.style.opacity = '1';
+                    element.style.transform = 'translateY(0)';
+                }, 100);
             });
         });
     </script>
