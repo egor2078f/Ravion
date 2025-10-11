@@ -24,6 +24,8 @@
             --success: #00ff00;
             --universal: #ff6b00;
             --highlight: #ffff00;
+            --rating: #ffd700;
+            --bookmark: #ff4757;
         }
 
         body {
@@ -94,6 +96,28 @@
             color: var(--accent);
         }
 
+        .nav-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            cursor: pointer;
+            padding: 0.5rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
         /* Main Content */
         .main {
             margin-top: 80px;
@@ -129,6 +153,35 @@
             max-width: 600px;
             margin: 0 auto 3rem;
             font-weight: 400;
+        }
+
+        /* Quick Stats */
+        .quick-stats {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 3rem;
+            flex-wrap: wrap;
+        }
+
+        .quick-stat {
+            text-align: center;
+            padding: 1rem 2rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+        }
+
+        .quick-stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .quick-stat-label {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
         }
 
         /* Search Section */
@@ -271,12 +324,19 @@
             margin-left: 0.5rem;
         }
 
-        /* Category Filter */
+        /* Filters Section */
+        .filters-section {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
         .category-filter {
             display: flex;
-            justify-content: center;
             gap: 1rem;
-            margin-bottom: 2rem;
             flex-wrap: wrap;
         }
 
@@ -310,6 +370,54 @@
         .category-btn.universal.active {
             background: var(--universal);
             color: var(--bg-primary);
+        }
+
+        .sort-filter {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+        }
+
+        .sort-select {
+            padding: 0.75rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        /* Tags Cloud */
+        .tags-cloud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            justify-content: center;
+        }
+
+        .tag {
+            padding: 0.5rem 1rem;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .tag:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            transform: translateY(-2px);
+        }
+
+        .tag.active {
+            background: var(--accent);
+            color: var(--bg-primary);
+            border-color: var(--accent);
         }
 
         /* Stats */
@@ -393,6 +501,10 @@
             border-color: var(--universal);
         }
 
+        .script-card.popular {
+            border-color: var(--rating);
+        }
+
         .script-card::before {
             content: '';
             position: absolute;
@@ -408,6 +520,10 @@
             background: linear-gradient(90deg, transparent, rgba(255,107,0,0.05), transparent);
         }
 
+        .script-card.popular::before {
+            background: linear-gradient(90deg, transparent, rgba(255,215,0,0.05), transparent);
+        }
+
         .script-card:hover::before {
             left: 100%;
         }
@@ -419,6 +535,10 @@
 
         .script-card.universal:hover {
             border-color: var(--universal);
+        }
+
+        .script-card.popular:hover {
+            border-color: var(--rating);
         }
 
         .script-header {
@@ -461,11 +581,9 @@
             color: var(--bg-primary);
         }
 
-        .script-description {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 1.5rem;
+        .script-card.popular .script-badge {
+            background: var(--rating);
+            color: var(--bg-primary);
         }
 
         .script-meta {
@@ -477,9 +595,74 @@
             color: var(--text-tertiary);
         }
 
-        .relevance-score {
+        .script-stats {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .stat {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            font-size: 0.8rem;
+        }
+
+        .rating {
+            color: var(--rating);
+        }
+
+        .downloads {
             color: var(--success);
-            font-weight: 600;
+        }
+
+        .bookmark-btn {
+            background: none;
+            border: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            padding: 0.3rem;
+        }
+
+        .bookmark-btn:hover {
+            color: var(--bookmark);
+            transform: scale(1.1);
+        }
+
+        .bookmark-btn.bookmarked {
+            color: var(--bookmark);
+        }
+
+        .script-description {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .script-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .script-tag {
+            padding: 0.3rem 0.6rem;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-secondary);
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .script-tag:hover {
+            background: var(--border);
+            color: var(--text-primary);
         }
 
         .script-actions {
@@ -532,6 +715,21 @@
             transform: translateY(-2px);
         }
 
+        /* Rating Stars */
+        .rating-stars {
+            display: flex;
+            gap: 0.2rem;
+        }
+
+        .star {
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
+        }
+
+        .star.filled {
+            color: var(--rating);
+        }
+
         /* Pagination */
         .pagination {
             display: flex;
@@ -573,6 +771,28 @@
         .page-btn.disabled:hover {
             background: var(--bg-secondary);
             border-color: var(--border);
+        }
+
+        /* Notifications */
+        .notification {
+            position: fixed;
+            top: 100px;
+            right: 2rem;
+            background: var(--success);
+            color: var(--bg-primary);
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            z-index: 10000;
+            transform: translateX(400px);
+            transition: transform 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .notification.show {
+            transform: translateX(0);
         }
 
         /* Code Modal */
@@ -775,6 +995,15 @@
             .search-tips {
                 display: none;
             }
+
+            .filters-section {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .sort-filter {
+                justify-content: center;
+            }
         }
 
         @media (max-width: 480px) {
@@ -790,6 +1019,14 @@
             .hero-title {
                 font-size: 2.5rem;
             }
+
+            .quick-stats {
+                gap: 1rem;
+            }
+
+            .quick-stat {
+                padding: 0.8rem 1.2rem;
+            }
         }
     </style>
 </head>
@@ -798,12 +1035,23 @@
         <div class="bg-grid"></div>
     </div>
 
+    <!-- Notification -->
+    <div class="notification" id="notification">
+        <i class="fas fa-check"></i>
+        <span id="notificationText"></span>
+    </div>
+
     <header class="header">
         <nav class="nav">
             <a href="#" class="logo">
                 <i class="fas fa-code logo-icon"></i>
                 RAVION
             </a>
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
         </nav>
     </header>
 
@@ -812,6 +1060,21 @@
             <section class="hero">
                 <h1 class="hero-title">RAVION SCRIPTS</h1>
                 <p class="hero-subtitle">Premium Roblox scripts for enhanced gaming experience</p>
+                
+                <div class="quick-stats">
+                    <div class="quick-stat">
+                        <div class="quick-stat-number" id="totalScriptsQuick">0</div>
+                        <div class="quick-stat-label">Total Scripts</div>
+                    </div>
+                    <div class="quick-stat">
+                        <div class="quick-stat-number" id="totalDownloads">0</div>
+                        <div class="quick-stat-label">Total Downloads</div>
+                    </div>
+                    <div class="quick-stat">
+                        <div class="quick-stat-number" id="avgRating">0.0</div>
+                        <div class="quick-stat-label">Avg Rating</div>
+                    </div>
+                </div>
             </section>
 
             <section class="search-section">
@@ -827,7 +1090,7 @@
                     <span class="search-tip">Name</span>
                     <span class="search-tip">Game</span>
                     <span class="search-tip">Description</span>
-                    <span class="search-tip">Universal</span>
+                    <span class="search-tip">Tags</span>
                 </div>
             </section>
 
@@ -835,10 +1098,29 @@
                 Found <span id="resultsCount">0</span> scripts <span id="relevanceInfo"></span>
             </div>
 
-            <div class="category-filter" id="categoryFilter">
-                <button class="category-btn active" data-category="all">All Scripts</button>
-                <button class="category-btn" data-category="universal">Universal</button>
-                <button class="category-btn" data-category="game">Game Specific</button>
+            <div class="tags-cloud" id="tagsCloud">
+                <!-- Tags will be loaded here -->
+            </div>
+
+            <div class="filters-section">
+                <div class="category-filter" id="categoryFilter">
+                    <button class="category-btn active" data-category="all">All Scripts</button>
+                    <button class="category-btn" data-category="universal">Universal</button>
+                    <button class="category-btn" data-category="game">Game Specific</button>
+                    <button class="category-btn" data-category="popular">Popular</button>
+                    <button class="category-btn" data-category="bookmarked">Bookmarks</button>
+                </div>
+
+                <div class="sort-filter">
+                    <span>Sort by:</span>
+                    <select class="sort-select" id="sortSelect">
+                        <option value="relevance">Relevance</option>
+                        <option value="rating">Rating</option>
+                        <option value="downloads">Downloads</option>
+                        <option value="newest">Newest</option>
+                        <option value="name">Name</option>
+                    </select>
+                </div>
             </div>
 
             <section class="stats">
@@ -916,6 +1198,7 @@
                 <div class="footer-links">
                     <a href="#" class="footer-link">Home</a>
                     <a href="#" class="footer-link">Scripts</a>
+                    <a href="#" class="footer-link" id="bookmarksLink">Bookmarks</a>
                 </div>
                 <p>&copy; 2025 RAVION SCRIPTS. All rights reserved.</p>
             </div>
@@ -927,16 +1210,20 @@
         const SCRIPTS_PER_PAGE = 4;
         let currentPage = 1;
         let currentCategory = 'all';
+        let currentSort = 'relevance';
+        let currentTag = '';
         let currentScripts = [];
         let filteredScripts = [];
         let searchTimeout = null;
+        let bookmarks = JSON.parse(localStorage.getItem('ravion_bookmarks')) || [];
 
         // Advanced search configuration
         const SEARCH_WEIGHTS = {
             name: 10,
             game: 8,
             description: 6,
-            type: 5
+            type: 5,
+            tags: 7
         };
 
         const STOP_WORDS = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by']);
@@ -950,7 +1237,6 @@
             }
 
             static stem(word) {
-                // Simple stemming for common endings
                 if (word.length <= 3) return word;
                 
                 const endings = [
@@ -975,6 +1261,17 @@
                     { name: 'type', weight: SEARCH_WEIGHTS.type }
                 ];
 
+                // Search in tags
+                if (script.tags) {
+                    script.tags.forEach(tag => {
+                        searchTokens.forEach(searchToken => {
+                            if (tag.toLowerCase().includes(searchToken)) {
+                                score += SEARCH_WEIGHTS.tags;
+                            }
+                        });
+                    });
+                }
+
                 for (const field of fields) {
                     const value = script[field.name] || '';
                     const tokens = this.tokenize(value);
@@ -983,19 +1280,16 @@
                     for (const searchToken of searchTokens) {
                         const stemmedSearchToken = this.stem(searchToken);
                         
-                        // Exact match
                         if (stemmedTokens.includes(stemmedSearchToken)) {
                             score += field.weight * 2;
                         }
                         
-                        // Partial match (contains)
                         for (const token of stemmedTokens) {
                             if (token.includes(stemmedSearchToken) || stemmedSearchToken.includes(token)) {
                                 score += field.weight;
                             }
                         }
                         
-                        // Fuzzy match (similarity)
                         for (const token of stemmedTokens) {
                             const similarity = this.calculateSimilarity(token, stemmedSearchToken);
                             if (similarity > 0.7) {
@@ -1005,12 +1299,10 @@
                     }
                 }
 
-                // Boost for exact name matches
                 if (script.name.toLowerCase().includes(searchTokens.join(' '))) {
                     score += 20;
                 }
 
-                // Boost for universal scripts when searching "universal"
                 if (searchTokens.includes('universal') && script.type === 'universal') {
                     score += 15;
                 }
@@ -1069,6 +1361,67 @@
             }
         }
 
+        // Utility functions
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function getRatingStars(rating) {
+            const stars = [];
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 >= 0.5;
+            
+            for (let i = 0; i < fullStars; i++) {
+                stars.push('<i class="fas fa-star star filled"></i>');
+            }
+            
+            if (hasHalfStar) {
+                stars.push('<i class="fas fa-star-half-alt star filled"></i>');
+            }
+            
+            const emptyStars = 5 - stars.length;
+            for (let i = 0; i < emptyStars; i++) {
+                stars.push('<i class="far fa-star star"></i>');
+            }
+            
+            return stars.join('');
+        }
+
+        function toggleBookmark(scriptId) {
+            const index = bookmarks.indexOf(scriptId);
+            if (index > -1) {
+                bookmarks.splice(index, 1);
+                showNotification('Removed from bookmarks');
+            } else {
+                bookmarks.push(scriptId);
+                showNotification('Added to bookmarks');
+            }
+            
+            localStorage.setItem('ravion_bookmarks', JSON.stringify(bookmarks));
+            
+            if (currentCategory === 'bookmarked') {
+                filterScripts('bookmarked');
+            } else {
+                displayScripts(filteredScripts.slice((currentPage - 1) * SCRIPTS_PER_PAGE, currentPage * SCRIPTS_PER_PAGE));
+            }
+        }
+
+        function isBookmarked(scriptId) {
+            return bookmarks.includes(scriptId);
+        }
+
+        function isPopular(script) {
+            return script.rating >= 4.5 && script.downloads > 1000;
+        }
+
         // Load scripts from JSON file
         let scriptsData = [];
 
@@ -1082,6 +1435,8 @@
                     updateStats();
                     displayPage(1);
                     generateSearchSuggestions();
+                    updateTagsCloud();
+                    updateQuickStats();
                 }
             } catch (error) {
                 console.error('Error loading scripts:', error);
@@ -1089,6 +1444,17 @@
                 currentScripts = [];
                 filteredScripts = [];
             }
+        }
+
+        // Update quick stats in hero section
+        function updateQuickStats() {
+            const totalDownloads = scriptsData.reduce((sum, script) => sum + (script.downloads || 0), 0);
+            const avgRating = scriptsData.length > 0 ? 
+                (scriptsData.reduce((sum, script) => sum + (script.rating || 0), 0) / scriptsData.length).toFixed(1) : '0.0';
+            
+            document.getElementById('totalScriptsQuick').textContent = scriptsData.length;
+            document.getElementById('totalDownloads').textContent = totalDownloads.toLocaleString();
+            document.getElementById('avgRating').textContent = avgRating;
         }
 
         // Generate search suggestions from script data
@@ -1100,7 +1466,10 @@
                 if (script.game) suggestions.add(script.game.toLowerCase());
                 if (script.type) suggestions.add(script.type.toLowerCase());
                 
-                // Add keywords from description
+                if (script.tags) {
+                    script.tags.forEach(tag => suggestions.add(tag.toLowerCase()));
+                }
+                
                 const descWords = script.description.toLowerCase().split(' ');
                 descWords.forEach(word => {
                     if (word.length > 3 && !STOP_WORDS.has(word)) {
@@ -1110,6 +1479,23 @@
             });
 
             return Array.from(suggestions).sort();
+        }
+
+        // Update tags cloud
+        function updateTagsCloud() {
+            const tagsCloud = document.getElementById('tagsCloud');
+            const allTags = new Set();
+            
+            scriptsData.forEach(script => {
+                if (script.tags) {
+                    script.tags.forEach(tag => allTags.add(tag.toLowerCase()));
+                }
+            });
+            
+            const tagsArray = Array.from(allTags).sort();
+            tagsCloud.innerHTML = tagsArray.map(tag => 
+                `<div class="tag" data-tag="${tag}">${tag}</div>`
+            ).join('');
         }
 
         // Update statistics
@@ -1139,10 +1525,28 @@
                 }
             });
 
-            // Sort by relevance score (descending)
             results.sort((a, b) => b.relevance - a.relevance);
             
             return results;
+        }
+
+        // Sort scripts
+        function sortScripts(scripts, sortBy) {
+            const sorted = [...scripts];
+            
+            switch (sortBy) {
+                case 'rating':
+                    return sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+                case 'downloads':
+                    return sorted.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+                case 'newest':
+                    return sorted.sort((a, b) => (b.id || 0) - (a.id || 0));
+                case 'name':
+                    return sorted.sort((a, b) => a.name.localeCompare(b.name));
+                case 'relevance':
+                default:
+                    return sorted;
+            }
         }
 
         // Show search suggestions
@@ -1197,7 +1601,6 @@
                     const searchResults = performSmartSearch(searchTerm);
                     currentScripts = searchResults.map(result => result.script);
                     
-                    // Show search results info
                     resultsCount.textContent = searchResults.length;
                     const highRelevanceCount = searchResults.filter(r => r.relevance > 50).length;
                     
@@ -1225,7 +1628,21 @@
                 filteredScripts = currentScripts.filter(script => script.type === 'universal');
             } else if (category === 'game') {
                 filteredScripts = currentScripts.filter(script => script.type !== 'universal');
+            } else if (category === 'popular') {
+                filteredScripts = currentScripts.filter(script => isPopular(script));
+            } else if (category === 'bookmarked') {
+                filteredScripts = currentScripts.filter(script => isBookmarked(script.id));
             }
+            
+            // Apply tag filter if active
+            if (currentTag) {
+                filteredScripts = filteredScripts.filter(script => 
+                    script.tags && script.tags.some(tag => tag.toLowerCase() === currentTag)
+                );
+            }
+            
+            // Apply sorting
+            filteredScripts = sortScripts(filteredScripts, currentSort);
             
             displayPage(1);
         }
@@ -1257,11 +1674,13 @@
 
             scripts.forEach(script => {
                 const isUniversal = script.type === 'universal';
+                const isPopularScript = isPopular(script);
+                const isBookmarkedScript = isBookmarked(script.id);
                 const searchTerm = document.getElementById('searchInput').value.trim();
                 const searchTokens = searchTerm ? SmartSearch.tokenize(searchTerm) : [];
                 
                 const card = document.createElement('div');
-                card.className = `script-card ${isUniversal ? 'universal' : ''}`;
+                card.className = `script-card ${isUniversal ? 'universal' : ''} ${isPopularScript ? 'popular' : ''}`;
                 card.innerHTML = `
                     <div class="script-header">
                         <div>
@@ -1276,11 +1695,30 @@
                         <span class="script-badge">#${script.id}</span>
                     </div>
                     <div class="script-meta">
-                        <span>${isUniversal ? 'Universal' : 'Game Specific'}</span>
+                        <div class="script-stats">
+                            <div class="stat rating">
+                                ${getRatingStars(script.rating || 0)}
+                                <span>${(script.rating || 0).toFixed(1)}</span>
+                            </div>
+                            <div class="stat downloads">
+                                <i class="fas fa-download"></i>
+                                <span>${(script.downloads || 0).toLocaleString()}</span>
+                            </div>
+                        </div>
+                        <button class="bookmark-btn ${isBookmarkedScript ? 'bookmarked' : ''}" onclick="toggleBookmark(${script.id})">
+                            <i class="fas fa-bookmark"></i>
+                        </button>
                     </div>
                     <p class="script-description">${
                         searchTerm ? SmartSearch.highlightText(script.description, searchTokens) : script.description
                     }</p>
+                    ${script.tags ? `
+                    <div class="script-tags">
+                        ${script.tags.map(tag => 
+                            `<div class="script-tag" onclick="filterByTag('${tag.toLowerCase()}')">${tag}</div>`
+                        ).join('')}
+                    </div>
+                    ` : ''}
                     <div class="script-actions">
                         <button class="btn btn-primary" onclick="viewScript(${script.id})">
                             <i class="fas fa-eye"></i>
@@ -1294,6 +1732,18 @@
                 `;
                 grid.appendChild(card);
             });
+        }
+
+        // Filter by tag
+        function filterByTag(tag) {
+            currentTag = currentTag === tag ? '' : tag;
+            
+            // Update tag buttons
+            document.querySelectorAll('.tag').forEach(btn => {
+                btn.classList.toggle('active', btn.getAttribute('data-tag') === tag && currentTag === tag);
+            });
+            
+            filterScripts(currentCategory);
         }
 
         // Update pagination controls
@@ -1311,7 +1761,6 @@
 
             let paginationHTML = '';
 
-            // Previous button
             if (currentPage > 1) {
                 paginationHTML += `<button class="page-btn" onclick="displayPage(${currentPage - 1})">
                     <i class="fas fa-chevron-left"></i>
@@ -1322,7 +1771,6 @@
                 </button>`;
             }
 
-            // Page numbers
             for (let i = 1; i <= totalPages; i++) {
                 if (i === currentPage) {
                     paginationHTML += `<button class="page-btn active">${i}</button>`;
@@ -1331,7 +1779,6 @@
                 }
             }
 
-            // Next button
             if (currentPage < totalPages) {
                 paginationHTML += `<button class="page-btn" onclick="displayPage(${currentPage + 1})">
                     <i class="fas fa-chevron-right"></i>
@@ -1354,7 +1801,6 @@
                 document.getElementById('modalCode').textContent = script.code;
                 document.getElementById('codeModal').classList.add('active');
                 
-                // Store current script ID for copy function
                 document.getElementById('copyCodeBtn').setAttribute('data-script-id', scriptId);
             }
         }
@@ -1364,6 +1810,7 @@
             const script = scriptsData.find(s => s.id === scriptId);
             if (script) {
                 navigator.clipboard.writeText(script.code).then(() => {
+                    showNotification('Script copied to clipboard!');
                     const btn = event.target;
                     const originalHTML = btn.innerHTML;
                     btn.innerHTML = '<i class="fas fa-check"></i>Copied!';
@@ -1398,6 +1845,35 @@
             }
         });
 
+        // Theme toggle
+        document.getElementById('themeToggle').addEventListener('click', function() {
+            const isDark = document.body.style.getProperty('--bg-primary') !== '#ffffff';
+            
+            if (isDark) {
+                // Switch to light theme
+                document.body.style.setProperty('--bg-primary', '#ffffff');
+                document.body.style.setProperty('--bg-secondary', '#f8f9fa');
+                document.body.style.setProperty('--bg-tertiary', '#e9ecef');
+                document.body.style.setProperty('--text-primary', '#212529');
+                document.body.style.setProperty('--text-secondary', '#6c757d');
+                document.body.style.setProperty('--text-tertiary', '#adb5bd');
+                document.body.style.setProperty('--border', '#dee2e6');
+                document.body.style.setProperty('--accent', '#212529');
+                this.innerHTML = '<i class="fas fa-sun"></i>';
+            } else {
+                // Switch to dark theme
+                document.body.style.setProperty('--bg-primary', '#0a0a0a');
+                document.body.style.setProperty('--bg-secondary', '#111111');
+                document.body.style.setProperty('--bg-tertiary', '#1a1a1a');
+                document.body.style.setProperty('--text-primary', '#ffffff');
+                document.body.style.setProperty('--text-secondary', '#888888');
+                document.body.style.setProperty('--text-tertiary', '#555555');
+                document.body.style.setProperty('--border', '#222222');
+                document.body.style.setProperty('--accent', '#ffffff');
+                this.innerHTML = '<i class="fas fa-moon"></i>';
+            }
+        });
+
         // Search functionality with debouncing and suggestions
         document.getElementById('searchInput').addEventListener('input', function(e) {
             const searchTerm = e.target.value;
@@ -1415,22 +1891,41 @@
         // Category filter functionality
         document.getElementById('categoryFilter').addEventListener('click', function(e) {
             if (e.target.classList.contains('category-btn')) {
-                // Remove active class from all buttons
                 document.querySelectorAll('.category-btn').forEach(btn => {
                     btn.classList.remove('active');
                 });
                 
-                // Add active class to clicked button
                 e.target.classList.add('active');
                 
-                // Filter scripts
                 const category = e.target.getAttribute('data-category');
                 filterScripts(category);
             }
+        });
+
+        // Sort functionality
+        document.getElementById('sortSelect').addEventListener('change', function(e) {
+            currentSort = e.target.value;
+            filterScripts(currentCategory);
+        });
+
+        // Tag cloud functionality
+        document.getElementById('tagsCloud').addEventListener('click', function(e) {
+            if (e.target.classList.contains('tag')) {
+                const tag = e.target.getAttribute('data-tag');
+                filterByTag(tag);
+            }
+        });
+
+        // Bookmarks link
+        document.getElementById('bookmarksLink').addEventListener('click', function(e) {
+            e.preventDefault();
+            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector('[data-category="bookmarked"]').classList.add('active');
+            filterScripts('bookmarked');
         });
 
         // Initialize
         loadScripts();
     </script>
 </body>
-</html>
+                    </html>
