@@ -23,7 +23,7 @@
     {
         "id": 4,
         "name": "Create Private Server", 
-        "game": "Universal",
+        "type": "universal",
         "description": "Free private server",
         "code": "loadstring(game:HttpGet(\"https://pastebin.com/raw/Ru4UQDpN\"))()"
     }
