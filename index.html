@@ -23,6 +23,7 @@
             --border: #222222;
             --success: #00ff00;
             --universal: #ff6b00;
+            --highlight: #ffff00;
         }
 
         body {
@@ -133,7 +134,7 @@
         /* Search Section */
         .search-section {
             max-width: 700px;
-            margin: 0 auto 4rem;
+            margin: 0 auto 2rem;
             position: relative;
         }
 
@@ -194,6 +195,82 @@
             color: var(--text-tertiary);
         }
 
+        /* Search Suggestions */
+        .search-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-top: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 100;
+            display: none;
+        }
+
+        .search-suggestions.active {
+            display: block;
+        }
+
+        .suggestion-item {
+            padding: 12px 16px;
+            cursor: pointer;
+            border-bottom: 1px solid var(--border);
+            transition: background-color 0.2s ease;
+        }
+
+        .suggestion-item:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .suggestion-highlight {
+            color: var(--highlight);
+            font-weight: 600;
+        }
+
+        /* Search Tips */
+        .search-tips {
+            text-align: center;
+            color: var(--text-tertiary);
+            font-size: 0.9rem;
+            margin-top: 1rem;
+        }
+
+        .search-tip {
+            display: inline-block;
+            margin: 0 0.5rem;
+            padding: 0.3rem 0.8rem;
+            background: var(--bg-tertiary);
+            border-radius: 15px;
+            border: 1px solid var(--border);
+        }
+
+        /* Search Results Info */
+        .search-results-info {
+            text-align: center;
+            color: var(--text-secondary);
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .relevance-badge {
+            display: inline-block;
+            padding: 0.2rem 0.6rem;
+            background: var(--success);
+            color: var(--bg-primary);
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+
         /* Category Filter */
         .category-filter {
             display: flex;
@@ -240,7 +317,7 @@
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 2rem;
-            margin: 4rem 0;
+            margin: 3rem 0;
         }
 
         .stat-card {
@@ -272,7 +349,7 @@
 
         /* Scripts Section */
         .scripts-section {
-            margin: 4rem 0;
+            margin: 3rem 0;
         }
 
         .section-header {
@@ -389,6 +466,20 @@
             font-size: 0.95rem;
             line-height: 1.6;
             margin-bottom: 1.5rem;
+        }
+
+        .script-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+            color: var(--text-tertiary);
+        }
+
+        .relevance-score {
+            color: var(--success);
+            font-weight: 600;
         }
 
         .script-actions {
@@ -680,6 +771,10 @@
                 padding: 0.6rem 1rem;
                 font-size: 0.8rem;
             }
+
+            .search-tips {
+                display: none;
+            }
         }
 
         @media (max-width: 480px) {
@@ -721,13 +816,24 @@
 
             <section class="search-section">
                 <div class="search-container">
-                    <label class="search-label">Search Scripts</label>
+                    <label class="search-label">Smart Search</label>
                     <div class="search-input-wrapper">
                         <i class="fas fa-search search-icon"></i>
-                        <input type="text" class="search-input" placeholder="Type to search scripts by name, game, or description..." id="searchInput">
+                        <input type="text" class="search-input" placeholder="Try: 'hack', 'adopt me', 'universal esp'..." id="searchInput">
+                        <div class="search-suggestions" id="searchSuggestions"></div>
                     </div>
                 </div>
+                <div class="search-tips">
+                    <span class="search-tip">Name</span>
+                    <span class="search-tip">Game</span>
+                    <span class="search-tip">Description</span>
+                    <span class="search-tip">Universal</span>
+                </div>
             </section>
+
+            <div class="search-results-info" id="searchResultsInfo" style="display: none;">
+                Found <span id="resultsCount">0</span> scripts <span id="relevanceInfo"></span>
+            </div>
 
             <div class="category-filter" id="categoryFilter">
                 <button class="category-btn active" data-category="all">All Scripts</button>
@@ -823,6 +929,145 @@
         let currentCategory = 'all';
         let currentScripts = [];
         let filteredScripts = [];
+        let searchTimeout = null;
+
+        // Advanced search configuration
+        const SEARCH_WEIGHTS = {
+            name: 10,
+            game: 8,
+            description: 6,
+            type: 5
+        };
+
+        const STOP_WORDS = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by']);
+
+        // Smart search algorithms
+        class SmartSearch {
+            static tokenize(text) {
+                return text.toLowerCase().split(/[^\w]+/).filter(token => 
+                    token.length > 2 && !STOP_WORDS.has(token)
+                );
+            }
+
+            static stem(word) {
+                // Simple stemming for common endings
+                if (word.length <= 3) return word;
+                
+                const endings = [
+                    'ing', 'ed', 's', 'es', 'ly', 'ment', 'ness', 'tion', 'sion'
+                ];
+                
+                for (const ending of endings) {
+                    if (word.endsWith(ending)) {
+                        return word.slice(0, -ending.length);
+                    }
+                }
+                
+                return word;
+            }
+
+            static calculateRelevance(script, searchTokens) {
+                let score = 0;
+                const fields = [
+                    { name: 'name', weight: SEARCH_WEIGHTS.name },
+                    { name: 'game', weight: SEARCH_WEIGHTS.game },
+                    { name: 'description', weight: SEARCH_WEIGHTS.description },
+                    { name: 'type', weight: SEARCH_WEIGHTS.type }
+                ];
+
+                for (const field of fields) {
+                    const value = script[field.name] || '';
+                    const tokens = this.tokenize(value);
+                    const stemmedTokens = tokens.map(this.stem);
+
+                    for (const searchToken of searchTokens) {
+                        const stemmedSearchToken = this.stem(searchToken);
+                        
+                        // Exact match
+                        if (stemmedTokens.includes(stemmedSearchToken)) {
+                            score += field.weight * 2;
+                        }
+                        
+                        // Partial match (contains)
+                        for (const token of stemmedTokens) {
+                            if (token.includes(stemmedSearchToken) || stemmedSearchToken.includes(token)) {
+                                score += field.weight;
+                            }
+                        }
+                        
+                        // Fuzzy match (similarity)
+                        for (const token of stemmedTokens) {
+                            const similarity = this.calculateSimilarity(token, stemmedSearchToken);
+                            if (similarity > 0.7) {
+                                score += field.weight * similarity;
+                            }
+                        }
+                    }
+                }
+
+                // Boost for exact name matches
+                if (script.name.toLowerCase().includes(searchTokens.join(' '))) {
+                    score += 20;
+                }
+
+                // Boost for universal scripts when searching "universal"
+                if (searchTokens.includes('universal') && script.type === 'universal') {
+                    score += 15;
+                }
+
+                return Math.min(100, Math.round(score));
+            }
+
+            static calculateSimilarity(a, b) {
+                const longer = a.length > b.length ? a : b;
+                const shorter = a.length > b.length ? b : a;
+                
+                if (longer.length === 0) return 1.0;
+                
+                return (longer.length - this.editDistance(longer, shorter)) / parseFloat(longer.length);
+            }
+
+            static editDistance(a, b) {
+                const matrix = [];
+                let i, j;
+
+                if (a.length === 0) return b.length;
+                if (b.length === 0) return a.length;
+
+                for (i = 0; i <= b.length; i++) {
+                    matrix[i] = [i];
+                }
+
+                for (j = 0; j <= a.length; j++) {
+                    matrix[0][j] = j;
+                }
+
+                for (i = 1; i <= b.length; i++) {
+                    for (j = 1; j <= a.length; j++) {
+                        if (b.charAt(i-1) === a.charAt(j-1)) {
+                            matrix[i][j] = matrix[i-1][j-1];
+                        } else {
+                            matrix[i][j] = Math.min(
+                                matrix[i-1][j-1] + 1,
+                                matrix[i][j-1] + 1,
+                                matrix[i-1][j] + 1
+                            );
+                        }
+                    }
+                }
+
+                return matrix[b.length][a.length];
+            }
+
+            static highlightText(text, searchTokens) {
+                let highlighted = text;
+                searchTokens.forEach(token => {
+                    const regex = new RegExp(`(${token})`, 'gi');
+                    highlighted = highlighted.replace(regex, '<span class="suggestion-highlight">$1</span>');
+                });
+                return highlighted;
+            }
+        }
 
         // Load scripts from JSON file
         let scriptsData = [];
@@ -836,6 +1081,7 @@
                     filteredScripts = [...scriptsData];
                     updateStats();
                     displayPage(1);
+                    generateSearchSuggestions();
                 }
             } catch (error) {
                 console.error('Error loading scripts:', error);
@@ -843,6 +1089,27 @@
                 currentScripts = [];
                 filteredScripts = [];
             }
+        }
+
+        // Generate search suggestions from script data
+        function generateSearchSuggestions() {
+            const suggestions = new Set();
+            
+            scriptsData.forEach(script => {
+                suggestions.add(script.name.toLowerCase());
+                if (script.game) suggestions.add(script.game.toLowerCase());
+                if (script.type) suggestions.add(script.type.toLowerCase());
+                
+                // Add keywords from description
+                const descWords = script.description.toLowerCase().split(' ');
+                descWords.forEach(word => {
+                    if (word.length > 3 && !STOP_WORDS.has(word)) {
+                        suggestions.add(word);
+                    }
+                });
+            });
+
+            return Array.from(suggestions).sort();
         }
 
         // Update statistics
@@ -854,6 +1121,98 @@
             
             document.getElementById('universalScripts').textContent = universalScripts;
             document.getElementById('gameScripts').textContent = gameScripts;
+        }
+
+        // Smart search function
+        function performSmartSearch(searchTerm) {
+            if (!searchTerm.trim()) {
+                return scriptsData.map(script => ({ script, relevance: 0 }));
+            }
+
+            const searchTokens = SmartSearch.tokenize(searchTerm);
+            const results = [];
+
+            scriptsData.forEach(script => {
+                const relevance = SmartSearch.calculateRelevance(script, searchTokens);
+                if (relevance > 0) {
+                    results.push({ script, relevance });
+                }
+            });
+
+            // Sort by relevance score (descending)
+            results.sort((a, b) => b.relevance - a.relevance);
+            
+            return results;
+        }
+
+        // Show search suggestions
+        function showSearchSuggestions(searchTerm) {
+            const suggestionsContainer = document.getElementById('searchSuggestions');
+            const suggestions = generateSearchSuggestions();
+            
+            if (!searchTerm.trim()) {
+                suggestionsContainer.classList.remove('active');
+                return;
+            }
+
+            const filteredSuggestions = suggestions.filter(suggestion =>
+                suggestion.includes(searchTerm.toLowerCase())
+            ).slice(0, 5);
+
+            if (filteredSuggestions.length === 0) {
+                suggestionsContainer.classList.remove('active');
+                return;
+            }
+
+            suggestionsContainer.innerHTML = filteredSuggestions.map(suggestion => 
+                `<div class="suggestion-item" onclick="selectSuggestion('${suggestion}')">${
+                    SmartSearch.highlightText(suggestion, [searchTerm])
+                }</div>`
+            ).join('');
+
+            suggestionsContainer.classList.add('active');
+        }
+
+        // Select suggestion from dropdown
+        function selectSuggestion(suggestion) {
+            document.getElementById('searchInput').value = suggestion;
+            document.getElementById('searchSuggestions').classList.remove('active');
+            performSearch();
+        }
+
+        // Perform search with debouncing
+        function performSearch() {
+            const searchTerm = document.getElementById('searchInput').value.trim();
+            const resultsInfo = document.getElementById('searchResultsInfo');
+            const relevanceInfo = document.getElementById('relevanceInfo');
+            const resultsCount = document.getElementById('resultsCount');
+
+            clearTimeout(searchTimeout);
+            
+            searchTimeout = setTimeout(() => {
+                if (searchTerm === '') {
+                    currentScripts = [...scriptsData];
+                    resultsInfo.style.display = 'none';
+                } else {
+                    const searchResults = performSmartSearch(searchTerm);
+                    currentScripts = searchResults.map(result => result.script);
+                    
+                    // Show search results info
+                    resultsCount.textContent = searchResults.length;
+                    const highRelevanceCount = searchResults.filter(r => r.relevance > 50).length;
+                    
+                    if (highRelevanceCount > 0) {
+                        relevanceInfo.innerHTML = `<span class="relevance-badge">${highRelevanceCount} highly relevant</span>`;
+                    } else {
+                        relevanceInfo.innerHTML = '';
+                    }
+                    
+                    resultsInfo.style.display = 'block';
+                }
+                
+                filterScripts(currentCategory);
+                document.getElementById('searchSuggestions').classList.remove('active');
+            }, 300);
         }
 
         // Filter scripts by category
@@ -898,17 +1257,30 @@
 
             scripts.forEach(script => {
                 const isUniversal = script.type === 'universal';
+                const searchTerm = document.getElementById('searchInput').value.trim();
+                const searchTokens = searchTerm ? SmartSearch.tokenize(searchTerm) : [];
+                
                 const card = document.createElement('div');
                 card.className = `script-card ${isUniversal ? 'universal' : ''}`;
                 card.innerHTML = `
                     <div class="script-header">
                         <div>
-                            <h3 class="script-title">${script.name}</h3>
-                            <div class="script-game">${isUniversal ? 'Universal Script' : script.game}</div>
+                            <h3 class="script-title">${
+                                searchTerm ? SmartSearch.highlightText(script.name, searchTokens) : script.name
+                            }</h3>
+                            <div class="script-game">${
+                                isUniversal ? 'Universal Script' : 
+                                (searchTerm ? SmartSearch.highlightText(script.game, searchTokens) : script.game)
+                            }</div>
                         </div>
                         <span class="script-badge">#${script.id}</span>
                     </div>
-                    <p class="script-description">${script.description}</p>
+                    <div class="script-meta">
+                        <span>${isUniversal ? 'Universal' : 'Game Specific'}</span>
+                    </div>
+                    <p class="script-description">${
+                        searchTerm ? SmartSearch.highlightText(script.description, searchTokens) : script.description
+                    }</p>
                     <div class="script-actions">
                         <button class="btn btn-primary" onclick="viewScript(${script.id})">
                             <i class="fas fa-eye"></i>
@@ -1026,21 +1398,18 @@
             }
         });
 
-        // Search functionality
+        // Search functionality with debouncing and suggestions
         document.getElementById('searchInput').addEventListener('input', function(e) {
-            const searchTerm = e.target.value.toLowerCase().trim();
-            
-            if (searchTerm === '') {
-                currentScripts = [...scriptsData];
-            } else {
-                currentScripts = scriptsData.filter(script => 
-                    script.name.toLowerCase().includes(searchTerm) ||
-                    (script.game && script.game.toLowerCase().includes(searchTerm)) ||
-                    script.description.toLowerCase().includes(searchTerm)
-                );
+            const searchTerm = e.target.value;
+            showSearchSuggestions(searchTerm);
+            performSearch();
+        });
+
+        // Hide suggestions when clicking outside
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.search-input-wrapper')) {
+                document.getElementById('searchSuggestions').classList.remove('active');
             }
-            
-            filterScripts(currentCategory);
         });
 
         // Category filter functionality
