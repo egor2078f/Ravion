@@ -10,7 +10,7 @@
 [
     {
         "id": 2,
-        "name": "Bloom", 
+        "name": "Bloom hub", 
         "game": "Plants vs Brainrots",
         "description": "bloom hack script",
         "code": "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/typescript-lover123/bloom-hub/refs/heads/main/loader.lua\"))()"
