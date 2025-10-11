@@ -26,5 +26,12 @@
         "type": "universal",
         "description": "Free private server",
         "code": "loadstring(game:HttpGet(\"https://pastebin.com/raw/Ru4UQDpN\"))()"
+    },
+    {
+        "id": 5,
+        "name": "Nxp Hub", 
+        "game": "Forsaken",
+        "description": "nxp hub script",
+        "code": "loadstring(game:HttpGet(\"https://raw.githubusercontent.com/WAVA094/d/refs/heads/main/Kys\"))()"
     }
 ]
