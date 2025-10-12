@@ -915,6 +915,47 @@
             color: var(--text-primary);
         }
 
+        /* Admin Tools */
+        .admin-tools {
+            margin-top: 20px;
+            padding: 15px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        .admin-title {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            text-align: center;
+        }
+
+        .admin-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .admin-btn {
+            padding: 8px 12px;
+            background: var(--bg-secondary);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-primary);
+            font-size: 0.7rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .admin-btn:hover {
+            background: var(--border);
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
             .nav {
@@ -985,6 +1026,16 @@
             .sort-filter {
                 justify-content: center;
             }
+
+            .admin-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .admin-btn {
+                width: 200px;
+                justify-content: center;
+            }
         }
 
         @media (max-width: 480px) {
@@ -1012,186 +1063,6 @@
     </style>
 </head>
 <body>
-    <script>
-// Client-side database management
-class ClientDatabase {
-    constructor() {
-        this.localKey = 'ravion_database';
-        this.loadFromLocal();
-    }
-
-    loadFromLocal() {
-        const localData = localStorage.getItem(this.localKey);
-        if (localData) {
-            try {
-                this.data = JSON.parse(localData);
-            } catch (e) {
-                this.data = this.getDefaultStructure();
-            }
-        } else {
-            this.data = this.getDefaultStructure();
-        }
-        return this.data;
-    }
-
-    getDefaultStructure() {
-        return {
-            views: {},
-            bookmarks: {},
-            statistics: {
-                totalViews: 0,
-                lastUpdated: new Date().toISOString()
-            }
-        };
-    }
-
-    saveToLocal() {
-        this.data.statistics.lastUpdated = new Date().toISOString();
-        localStorage.setItem(this.localKey, JSON.stringify(this.data));
-        return this.data;
-    }
-
-    // Sync with GitHub database.json
-    async syncWithGitHub() {
-        try {
-            const response = await fetch('database.json?t=' + Date.now());
-            if (response.ok) {
-                const githubData = await response.json();
-                this.mergeData(githubData);
-                this.saveToLocal();
-                console.log('Synced with GitHub database');
-            }
-        } catch (error) {
-            console.log('GitHub sync failed, using local data');
-        }
-    }
-
-    // Merge GitHub data with local data
-    mergeData(githubData) {
-        // Merge views (take maximum values)
-        for (const [scriptId, githubViews] of Object.entries(githubData.views || {})) {
-            const localViews = this.data.views[scriptId] || 0;
-            this.data.views[scriptId] = Math.max(localViews, githubViews);
-        }
-
-        // Merge bookmarks (union)
-        for (const [userId, githubBookmarks] of Object.entries(githubData.bookmarks || {})) {
-            const localBookmarks = this.data.bookmarks[userId] || [];
-            const mergedBookmarks = [...new Set([...localBookmarks, ...githubBookmarks])];
-            this.data.bookmarks[userId] = mergedBookmarks;
-        }
-
-        // Update statistics
-        this.data.statistics.totalViews = Object.values(this.data.views).reduce((a, b) => a + b, 0);
-    }
-
-    // Save to GitHub (this would require a server, but we'll prepare for future)
-    async saveToGitHub() {
-        // In a real implementation, this would commit to GitHub via API
-        // For now, we'll just log and save locally
-        console.log('Would save to GitHub:', this.data);
-        this.saveToLocal();
-    }
-
-    incrementViews(scriptId) {
-        if (!this.data.views[scriptId]) {
-            this.data.views[scriptId] = 0;
-        }
-        this.data.views[scriptId]++;
-        this.data.statistics.totalViews++;
-        
-        this.saveToLocal();
-        
-        // Try to sync with GitHub in background
-        setTimeout(() => this.syncWithGitHub(), 1000);
-        
-        return this.data.views[scriptId];
-    }
-
-    getViews(scriptId) {
-        return this.data.views[scriptId] || 0;
-    }
-
-    toggleBookmark(userId, scriptId) {
-        if (!this.data.bookmarks[userId]) {
-            this.data.bookmarks[userId] = [];
-        }
-        
-        const bookmarks = this.data.bookmarks[userId];
-        const index = bookmarks.indexOf(scriptId);
-        
-        if (index > -1) {
-            bookmarks.splice(index, 1);
-        } else {
-            bookmarks.push(scriptId);
-        }
-        
-        this.saveToLocal();
-        return bookmarks;
-    }
-
-    isBookmarked(userId, scriptId) {
-        return this.data.bookmarks[userId]?.includes(scriptId) || false;
-    }
-
-    getGlobalStats() {
-        const popularScripts = Object.entries(this.data.views)
-            .map(([scriptId, views]) => ({ scriptId: parseInt(scriptId), views }))
-            .sort((a, b) => b.views - a.views)
-            .slice(0, 5);
-
-        return {
-            totalViews: this.data.statistics.totalViews,
-            totalScripts: Object.keys(this.data.views).length,
-            popularScripts: popularScripts,
-            lastUpdated: this.data.statistics.lastUpdated
-        };
-    }
-
-    // Export data for manual backup
-    exportData() {
-        return JSON.stringify(this.data, null, 2);
-    }
-
-    // Import data from backup
-    importData(jsonData) {
-        try {
-            const imported = JSON.parse(jsonData);
-            this.data = { ...this.getDefaultStructure(), ...imported };
-            this.saveToLocal();
-            return true;
-        } catch (e) {
-            console.error('Invalid backup data');
-            return false;
-        }
-    }
-}
-
-// Initialize database
-const clientDB = new ClientDatabase();
-
-// Update all functions to use clientDB instead of database object
-
-// Replace the incrementViews function:
-async function incrementViews(scriptId) {
-    const views = clientDB.incrementViews(scriptId);
-    updateQuickStats();
-    return views;
-}
-
-// Replace getViews function:
-function getViews(scriptId) {
-    return clientDB.getViews(scriptId);
-}
-
-// Replace toggleBookmark function:
-function toggleBookmark(scriptId) {
-    const userId = 'default_user'; // For GitHub Pages, use a single user
-    clientDB.toggleBookmark(userId, scriptId);
-    
-    if (currentCategory === 'bookmarked') {
-        filterScripts('bookmarked');
-    } else {
     <div class="bg-effects">
         <div class="bg-grid"></div>
     </div>
@@ -1359,6 +1230,26 @@ function toggleBookmark(scriptId) {
                     <a href="#" class="footer-link">Scripts</a>
                     <a href="#" class="footer-link" id="bookmarksLink">Bookmarks</a>
                 </div>
+                
+                <div class="admin-tools">
+                    <div class="admin-title">Database Tools</div>
+                    <div class="admin-buttons">
+                        <button class="admin-btn" onclick="syncDatabase()">
+                            <i class="fas fa-sync"></i> Sync with GitHub
+                        </button>
+                        <button class="admin-btn" onclick="backupDatabase()">
+                            <i class="fas fa-download"></i> Download Backup
+                        </button>
+                        <label class="admin-btn" style="cursor: pointer;">
+                            <i class="fas fa-upload"></i> Import Backup
+                            <input type="file" accept=".json" onchange="importDatabase(event)" style="display: none;">
+                        </label>
+                        <button class="admin-btn" onclick="clearDatabase()">
+                            <i class="fas fa-trash"></i> Clear Local Data
+                        </button>
+                    </div>
+                </div>
+                
                 <p>&copy; 2025 RAVION SCRIPTS. All rights reserved.</p>
             </div>
         </div>
@@ -1374,56 +1265,160 @@ function toggleBookmark(scriptId) {
         let currentScripts = [];
         let filteredScripts = [];
         let searchTimeout = null;
-        let bookmarks = JSON.parse(localStorage.getItem('ravion_bookmarks')) || [];
-        let database = { views: {} };
 
-        // Load database
-        async function loadDatabase() {
-            try {
-                const response = await fetch('database.json?t=' + Date.now());
-                if (response.ok) {
-                    const data = await response.json();
-                    database = data;
+        // Client-side database management
+        class ClientDatabase {
+            constructor() {
+                this.localKey = 'ravion_database';
+                this.loadFromLocal();
+            }
+
+            loadFromLocal() {
+                const localData = localStorage.getItem(this.localKey);
+                if (localData) {
+                    try {
+                        this.data = JSON.parse(localData);
+                    } catch (e) {
+                        this.data = this.getDefaultStructure();
+                    }
+                } else {
+                    this.data = this.getDefaultStructure();
                 }
-            } catch (error) {
-                console.log('No database file found, creating new one');
-                database = { views: {} };
-                await saveDatabase();
+                return this.data;
+            }
+
+            getDefaultStructure() {
+                return {
+                    views: {},
+                    bookmarks: {},
+                    statistics: {
+                        totalViews: 0,
+                        lastUpdated: new Date().toISOString()
+                    }
+                };
+            }
+
+            saveToLocal() {
+                this.data.statistics.lastUpdated = new Date().toISOString();
+                localStorage.setItem(this.localKey, JSON.stringify(this.data));
+                return this.data;
+            }
+
+            // Sync with GitHub database.json
+            async syncWithGitHub() {
+                try {
+                    const response = await fetch('database.json?t=' + Date.now());
+                    if (response.ok) {
+                        const githubData = await response.json();
+                        this.mergeData(githubData);
+                        this.saveToLocal();
+                        console.log('Synced with GitHub database');
+                        return true;
+                    }
+                } catch (error) {
+                    console.log('GitHub sync failed, using local data');
+                }
+                return false;
+            }
+
+            // Merge GitHub data with local data
+            mergeData(githubData) {
+                // Merge views (take maximum values)
+                for (const [scriptId, githubViews] of Object.entries(githubData.views || {})) {
+                    const localViews = this.data.views[scriptId] || 0;
+                    this.data.views[scriptId] = Math.max(localViews, githubViews);
+                }
+
+                // Merge bookmarks (union)
+                for (const [userId, githubBookmarks] of Object.entries(githubData.bookmarks || {})) {
+                    const localBookmarks = this.data.bookmarks[userId] || [];
+                    const mergedBookmarks = [...new Set([...localBookmarks, ...githubBookmarks])];
+                    this.data.bookmarks[userId] = mergedBookmarks;
+                }
+
+                // Update statistics
+                this.data.statistics.totalViews = Object.values(this.data.views).reduce((a, b) => a + b, 0);
+            }
+
+            incrementViews(scriptId) {
+                if (!this.data.views[scriptId]) {
+                    this.data.views[scriptId] = 0;
+                }
+                this.data.views[scriptId]++;
+                this.data.statistics.totalViews++;
+                
+                this.saveToLocal();
+                return this.data.views[scriptId];
+            }
+
+            getViews(scriptId) {
+                return this.data.views[scriptId] || 0;
+            }
+
+            toggleBookmark(userId, scriptId) {
+                if (!this.data.bookmarks[userId]) {
+                    this.data.bookmarks[userId] = [];
+                }
+                
+                const bookmarks = this.data.bookmarks[userId];
+                const index = bookmarks.indexOf(scriptId);
+                
+                if (index > -1) {
+                    bookmarks.splice(index, 1);
+                } else {
+                    bookmarks.push(scriptId);
+                }
+                
+                this.saveToLocal();
+                return bookmarks;
+            }
+
+            isBookmarked(userId, scriptId) {
+                return this.data.bookmarks[userId]?.includes(scriptId) || false;
+            }
+
+            getGlobalStats() {
+                const popularScripts = Object.entries(this.data.views)
+                    .map(([scriptId, views]) => ({ scriptId: parseInt(scriptId), views }))
+                    .sort((a, b) => b.views - a.views)
+                    .slice(0, 5);
+
+                return {
+                    totalViews: this.data.statistics.totalViews,
+                    totalScripts: Object.keys(this.data.views).length,
+                    popularScripts: popularScripts,
+                    lastUpdated: this.data.statistics.lastUpdated
+                };
+            }
+
+            // Export data for manual backup
+            exportData() {
+                return JSON.stringify(this.data, null, 2);
+            }
+
+            // Import data from backup
+            importData(jsonData) {
+                try {
+                    const imported = JSON.parse(jsonData);
+                    this.data = { ...this.getDefaultStructure(), ...imported };
+                    this.saveToLocal();
+                    return true;
+                } catch (e) {
+                    console.error('Invalid backup data');
+                    return false;
+                }
+            }
+
+            // Clear all data
+            clearData() {
+                this.data = this.getDefaultStructure();
+                this.saveToLocal();
+                return true;
             }
         }
 
-        // Save database
-        async function saveDatabase() {
-            try {
-                // In a real implementation, this would send data to a server
-                // For now, we'll simulate it by storing in localStorage as backup
-                localStorage.setItem('ravion_database', JSON.stringify(database));
-                console.log('Database saved (simulated)');
-            } catch (error) {
-                console.error('Error saving database:', error);
-            }
-        }
-
-        // Increment view count
-        async function incrementViews(scriptId) {
-            if (!database.views[scriptId]) {
-                database.views[scriptId] = 0;
-            }
-            database.views[scriptId]++;
-            await saveDatabase();
-            return database.views[scriptId];
-        }
-
-        // Get view count
-        function getViews(scriptId) {
-            return database.views[scriptId] || 0;
-        }
-
-        // Check if script is popular
-        function isPopular(script) {
-            const views = getViews(script.id);
-            return views > 100; // Consider popular if more than 100 views
-        }
+        // Initialize database
+        const clientDB = new ClientDatabase();
 
         // Utility functions
         function showNotification(message) {
@@ -1438,27 +1433,35 @@ function toggleBookmark(scriptId) {
             }, 3000);
         }
 
+        function getViews(scriptId) {
+            return clientDB.getViews(scriptId);
+        }
+
+        function isBookmarked(scriptId) {
+            const userId = 'default_user';
+            return clientDB.isBookmarked(userId, scriptId);
+        }
+
+        function isPopular(script) {
+            const views = getViews(script.id);
+            return views > 50;
+        }
+
+        async function incrementViews(scriptId) {
+            const views = clientDB.incrementViews(scriptId);
+            updateQuickStats();
+            return views;
+        }
+
         function toggleBookmark(scriptId) {
-            const index = bookmarks.indexOf(scriptId);
-            if (index > -1) {
-                bookmarks.splice(index, 1);
-                showNotification('Removed from bookmarks');
-            } else {
-                bookmarks.push(scriptId);
-                showNotification('Added to bookmarks');
-            }
-            
-            localStorage.setItem('ravion_bookmarks', JSON.stringify(bookmarks));
+            const userId = 'default_user';
+            clientDB.toggleBookmark(userId, scriptId);
             
             if (currentCategory === 'bookmarked') {
                 filterScripts('bookmarked');
             } else {
                 displayScripts(filteredScripts.slice((currentPage - 1) * SCRIPTS_PER_PAGE, currentPage * SCRIPTS_PER_PAGE));
             }
-        }
-
-        function isBookmarked(scriptId) {
-            return bookmarks.includes(scriptId);
         }
 
         // Advanced search configuration
@@ -1610,7 +1613,6 @@ function toggleBookmark(scriptId) {
 
         async function loadScripts() {
             try {
-                await loadDatabase();
                 const response = await fetch('scripts.json?t=' + Date.now());
                 if (response.ok) {
                     scriptsData = await response.json();
@@ -1632,11 +1634,11 @@ function toggleBookmark(scriptId) {
 
         // Update quick stats in hero section
         function updateQuickStats() {
-            const totalViews = Object.values(database.views).reduce((sum, views) => sum + views, 0);
+            const stats = clientDB.getGlobalStats();
             const popularScriptsCount = scriptsData.filter(script => isPopular(script)).length;
             
             document.getElementById('totalScriptsQuick').textContent = scriptsData.length;
-            document.getElementById('totalViews').textContent = totalViews.toLocaleString();
+            document.getElementById('totalViews').textContent = stats.totalViews.toLocaleString();
             document.getElementById('popularScripts').textContent = popularScriptsCount;
         }
 
@@ -1975,7 +1977,6 @@ function toggleBookmark(scriptId) {
             if (script) {
                 // Increment view count
                 await incrementViews(scriptId);
-                updateQuickStats();
                 
                 const isUniversal = script.type === 'universal';
                 document.getElementById('modalTitle').textContent = `${script.name} - ${isUniversal ? 'Universal Script' : script.game}`;
@@ -2007,6 +2008,63 @@ function toggleBookmark(scriptId) {
                         btn.className = 'btn btn-secondary';
                     }, 2000);
                 });
+            }
+        }
+
+        // Database management functions
+        async function syncDatabase() {
+            showNotification('Syncing with GitHub...');
+            const success = await clientDB.syncWithGitHub();
+            if (success) {
+                updateQuickStats();
+                if (currentCategory === 'popular' || currentSort === 'views') {
+                    filterScripts(currentCategory);
+                }
+                showNotification('Database synced with GitHub!');
+            } else {
+                showNotification('Sync failed - using local data');
+            }
+        }
+
+        function backupDatabase() {
+            const data = clientDB.exportData();
+            const blob = new Blob([data], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `ravion_backup_${Date.now()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            showNotification('Backup downloaded!');
+        }
+
+        function importDatabase(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const success = clientDB.importData(e.target.result);
+                    if (success) {
+                        updateQuickStats();
+                        filterScripts(currentCategory);
+                        showNotification('Database imported successfully!');
+                    } else {
+                        showNotification('Import failed - invalid file format!');
+                    }
+                };
+                reader.readAsText(file);
+            }
+            event.target.value = '';
+        }
+
+        function clearDatabase() {
+            if (confirm('Are you sure you want to clear all local data? This cannot be undone!')) {
+                clientDB.clearData();
+                updateQuickStats();
+                filterScripts(currentCategory);
+                showNotification('Local data cleared!');
             }
         }
 
@@ -2045,6 +2103,10 @@ function toggleBookmark(scriptId) {
                 document.body.style.setProperty('--text-tertiary', '#adb5bd');
                 document.body.style.setProperty('--border', '#dee2e6');
                 document.body.style.setProperty('--accent', '#212529');
+                document.body.style.setProperty('--success', '#198754');
+                document.body.style.setProperty('--universal', '#fd7e14');
+                document.body.style.setProperty('--views', '#0d6efd');
+                document.body.style.setProperty('--bookmark', '#dc3545');
                 this.innerHTML = '<i class="fas fa-sun"></i>';
             } else {
                 // Switch to dark theme
@@ -2056,6 +2118,10 @@ function toggleBookmark(scriptId) {
                 document.body.style.setProperty('--text-tertiary', '#555555');
                 document.body.style.setProperty('--border', '#222222');
                 document.body.style.setProperty('--accent', '#ffffff');
+                document.body.style.setProperty('--success', '#00ff00');
+                document.body.style.setProperty('--universal', '#ff6b00');
+                document.body.style.setProperty('--views', '#4dabf7');
+                document.body.style.setProperty('--bookmark', '#ff4757');
                 this.innerHTML = '<i class="fas fa-moon"></i>';
             }
         });
@@ -2110,8 +2176,17 @@ function toggleBookmark(scriptId) {
             filterScripts('bookmarked');
         });
 
+        // Auto-sync on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                clientDB.syncWithGitHub().then(() => {
+                    updateQuickStats();
+                });
+            }, 1000);
+        });
+
         // Initialize
         loadScripts();
     </script>
 </body>
-</html>
+                    </html>
