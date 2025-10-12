@@ -24,7 +24,7 @@
             --success: #00ff00;
             --universal: #ff6b00;
             --highlight: #ffff00;
-            --rating: #ffd700;
+            --views: #4dabf7;
             --bookmark: #ff4757;
         }
 
@@ -502,7 +502,7 @@
         }
 
         .script-card.popular {
-            border-color: var(--rating);
+            border-color: var(--views);
         }
 
         .script-card::before {
@@ -521,7 +521,7 @@
         }
 
         .script-card.popular::before {
-            background: linear-gradient(90deg, transparent, rgba(255,215,0,0.05), transparent);
+            background: linear-gradient(90deg, transparent, rgba(77,171,247,0.05), transparent);
         }
 
         .script-card:hover::before {
@@ -538,7 +538,7 @@
         }
 
         .script-card.popular:hover {
-            border-color: var(--rating);
+            border-color: var(--views);
         }
 
         .script-header {
@@ -582,7 +582,7 @@
         }
 
         .script-card.popular .script-badge {
-            background: var(--rating);
+            background: var(--views);
             color: var(--bg-primary);
         }
 
@@ -608,12 +608,8 @@
             font-size: 0.8rem;
         }
 
-        .rating {
-            color: var(--rating);
-        }
-
-        .downloads {
-            color: var(--success);
+        .views {
+            color: var(--views);
         }
 
         .bookmark-btn {
@@ -713,21 +709,6 @@
         .btn-success:hover {
             background: #00cc00;
             transform: translateY(-2px);
-        }
-
-        /* Rating Stars */
-        .rating-stars {
-            display: flex;
-            gap: 0.2rem;
-        }
-
-        .star {
-            color: var(--text-tertiary);
-            font-size: 0.9rem;
-        }
-
-        .star.filled {
-            color: var(--rating);
         }
 
         /* Pagination */
@@ -1067,12 +1048,12 @@
                         <div class="quick-stat-label">Total Scripts</div>
                     </div>
                     <div class="quick-stat">
-                        <div class="quick-stat-number" id="totalDownloads">0</div>
-                        <div class="quick-stat-label">Total Downloads</div>
+                        <div class="quick-stat-number" id="totalViews">0</div>
+                        <div class="quick-stat-label">Total Views</div>
                     </div>
                     <div class="quick-stat">
-                        <div class="quick-stat-number" id="avgRating">0.0</div>
-                        <div class="quick-stat-label">Avg Rating</div>
+                        <div class="quick-stat-number" id="popularScripts">0</div>
+                        <div class="quick-stat-label">Popular</div>
                     </div>
                 </div>
             </section>
@@ -1114,9 +1095,7 @@
                 <div class="sort-filter">
                     <span>Sort by:</span>
                     <select class="sort-select" id="sortSelect">
-                        <option value="relevance">Relevance</option>
-                        <option value="rating">Rating</option>
-                        <option value="downloads">Downloads</option>
+                        <option value="views">Most Viewed</option>
                         <option value="newest">Newest</option>
                         <option value="name">Name</option>
                     </select>
@@ -1210,12 +1189,97 @@
         const SCRIPTS_PER_PAGE = 4;
         let currentPage = 1;
         let currentCategory = 'all';
-        let currentSort = 'relevance';
+        let currentSort = 'views';
         let currentTag = '';
         let currentScripts = [];
         let filteredScripts = [];
         let searchTimeout = null;
         let bookmarks = JSON.parse(localStorage.getItem('ravion_bookmarks')) || [];
+        let database = { views: {} };
+
+        // Load database
+        async function loadDatabase() {
+            try {
+                const response = await fetch('database.json?t=' + Date.now());
+                if (response.ok) {
+                    const data = await response.json();
+                    database = data;
+                }
+            } catch (error) {
+                console.log('No database file found, creating new one');
+                database = { views: {} };
+                await saveDatabase();
+            }
+        }
+
+        // Save database
+        async function saveDatabase() {
+            try {
+                // In a real implementation, this would send data to a server
+                // For now, we'll simulate it by storing in localStorage as backup
+                localStorage.setItem('ravion_database', JSON.stringify(database));
+                console.log('Database saved (simulated)');
+            } catch (error) {
+                console.error('Error saving database:', error);
+            }
+        }
+
+        // Increment view count
+        async function incrementViews(scriptId) {
+            if (!database.views[scriptId]) {
+                database.views[scriptId] = 0;
+            }
+            database.views[scriptId]++;
+            await saveDatabase();
+            return database.views[scriptId];
+        }
+
+        // Get view count
+        function getViews(scriptId) {
+            return database.views[scriptId] || 0;
+        }
+
+        // Check if script is popular
+        function isPopular(script) {
+            const views = getViews(script.id);
+            return views > 100; // Consider popular if more than 100 views
+        }
+
+        // Utility functions
+        function showNotification(message) {
+            const notification = document.getElementById('notification');
+            const notificationText = document.getElementById('notificationText');
+            
+            notificationText.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function toggleBookmark(scriptId) {
+            const index = bookmarks.indexOf(scriptId);
+            if (index > -1) {
+                bookmarks.splice(index, 1);
+                showNotification('Removed from bookmarks');
+            } else {
+                bookmarks.push(scriptId);
+                showNotification('Added to bookmarks');
+            }
+            
+            localStorage.setItem('ravion_bookmarks', JSON.stringify(bookmarks));
+            
+            if (currentCategory === 'bookmarked') {
+                filterScripts('bookmarked');
+            } else {
+                displayScripts(filteredScripts.slice((currentPage - 1) * SCRIPTS_PER_PAGE, currentPage * SCRIPTS_PER_PAGE));
+            }
+        }
+
+        function isBookmarked(scriptId) {
+            return bookmarks.includes(scriptId);
+        }
 
         // Advanced search configuration
         const SEARCH_WEIGHTS = {
@@ -1361,72 +1425,12 @@
             }
         }
 
-        // Utility functions
-        function showNotification(message) {
-            const notification = document.getElementById('notification');
-            const notificationText = document.getElementById('notificationText');
-            
-            notificationText.textContent = message;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        function getRatingStars(rating) {
-            const stars = [];
-            const fullStars = Math.floor(rating);
-            const hasHalfStar = rating % 1 >= 0.5;
-            
-            for (let i = 0; i < fullStars; i++) {
-                stars.push('<i class="fas fa-star star filled"></i>');
-            }
-            
-            if (hasHalfStar) {
-                stars.push('<i class="fas fa-star-half-alt star filled"></i>');
-            }
-            
-            const emptyStars = 5 - stars.length;
-            for (let i = 0; i < emptyStars; i++) {
-                stars.push('<i class="far fa-star star"></i>');
-            }
-            
-            return stars.join('');
-        }
-
-        function toggleBookmark(scriptId) {
-            const index = bookmarks.indexOf(scriptId);
-            if (index > -1) {
-                bookmarks.splice(index, 1);
-                showNotification('Removed from bookmarks');
-            } else {
-                bookmarks.push(scriptId);
-                showNotification('Added to bookmarks');
-            }
-            
-            localStorage.setItem('ravion_bookmarks', JSON.stringify(bookmarks));
-            
-            if (currentCategory === 'bookmarked') {
-                filterScripts('bookmarked');
-            } else {
-                displayScripts(filteredScripts.slice((currentPage - 1) * SCRIPTS_PER_PAGE, currentPage * SCRIPTS_PER_PAGE));
-            }
-        }
-
-        function isBookmarked(scriptId) {
-            return bookmarks.includes(scriptId);
-        }
-
-        function isPopular(script) {
-            return script.rating >= 4.5 && script.downloads > 1000;
-        }
-
         // Load scripts from JSON file
         let scriptsData = [];
 
         async function loadScripts() {
             try {
+                await loadDatabase();
                 const response = await fetch('scripts.json?t=' + Date.now());
                 if (response.ok) {
                     scriptsData = await response.json();
@@ -1448,13 +1452,12 @@
 
         // Update quick stats in hero section
         function updateQuickStats() {
-            const totalDownloads = scriptsData.reduce((sum, script) => sum + (script.downloads || 0), 0);
-            const avgRating = scriptsData.length > 0 ? 
-                (scriptsData.reduce((sum, script) => sum + (script.rating || 0), 0) / scriptsData.length).toFixed(1) : '0.0';
+            const totalViews = Object.values(database.views).reduce((sum, views) => sum + views, 0);
+            const popularScriptsCount = scriptsData.filter(script => isPopular(script)).length;
             
             document.getElementById('totalScriptsQuick').textContent = scriptsData.length;
-            document.getElementById('totalDownloads').textContent = totalDownloads.toLocaleString();
-            document.getElementById('avgRating').textContent = avgRating;
+            document.getElementById('totalViews').textContent = totalViews.toLocaleString();
+            document.getElementById('popularScripts').textContent = popularScriptsCount;
         }
 
         // Generate search suggestions from script data
@@ -1535,15 +1538,12 @@
             const sorted = [...scripts];
             
             switch (sortBy) {
-                case 'rating':
-                    return sorted.sort((a, b) => (b.rating || 0) - (a.rating || 0));
-                case 'downloads':
-                    return sorted.sort((a, b) => (b.downloads || 0) - (a.downloads || 0));
+                case 'views':
+                    return sorted.sort((a, b) => getViews(b.id) - getViews(a.id));
                 case 'newest':
                     return sorted.sort((a, b) => (b.id || 0) - (a.id || 0));
                 case 'name':
                     return sorted.sort((a, b) => a.name.localeCompare(b.name));
-                case 'relevance':
                 default:
                     return sorted;
             }
@@ -1676,6 +1676,7 @@
                 const isUniversal = script.type === 'universal';
                 const isPopularScript = isPopular(script);
                 const isBookmarkedScript = isBookmarked(script.id);
+                const views = getViews(script.id);
                 const searchTerm = document.getElementById('searchInput').value.trim();
                 const searchTokens = searchTerm ? SmartSearch.tokenize(searchTerm) : [];
                 
@@ -1696,13 +1697,9 @@
                     </div>
                     <div class="script-meta">
                         <div class="script-stats">
-                            <div class="stat rating">
-                                ${getRatingStars(script.rating || 0)}
-                                <span>${(script.rating || 0).toFixed(1)}</span>
-                            </div>
-                            <div class="stat downloads">
-                                <i class="fas fa-download"></i>
-                                <span>${(script.downloads || 0).toLocaleString()}</span>
+                            <div class="stat views">
+                                <i class="fas fa-eye"></i>
+                                <span>${views.toLocaleString()} views</span>
                             </div>
                         </div>
                         <button class="bookmark-btn ${isBookmarkedScript ? 'bookmarked' : ''}" onclick="toggleBookmark(${script.id})">
@@ -1793,15 +1790,24 @@
         }
 
         // View script code
-        function viewScript(scriptId) {
+        async function viewScript(scriptId) {
             const script = scriptsData.find(s => s.id === scriptId);
             if (script) {
+                // Increment view count
+                await incrementViews(scriptId);
+                updateQuickStats();
+                
                 const isUniversal = script.type === 'universal';
                 document.getElementById('modalTitle').textContent = `${script.name} - ${isUniversal ? 'Universal Script' : script.game}`;
                 document.getElementById('modalCode').textContent = script.code;
                 document.getElementById('codeModal').classList.add('active');
                 
                 document.getElementById('copyCodeBtn').setAttribute('data-script-id', scriptId);
+                
+                // Refresh the displayed script to show updated view count
+                if (currentCategory === 'popular' || currentSort === 'views') {
+                    filterScripts(currentCategory);
+                }
             }
         }
 
@@ -1928,4 +1934,4 @@
         loadScripts();
     </script>
 </body>
-                    </html>
+</html>
