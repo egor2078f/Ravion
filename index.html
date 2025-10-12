@@ -1012,6 +1012,186 @@
     </style>
 </head>
 <body>
+    <script>
+// Client-side database management
+class ClientDatabase {
+    constructor() {
+        this.localKey = 'ravion_database';
+        this.loadFromLocal();
+    }
+
+    loadFromLocal() {
+        const localData = localStorage.getItem(this.localKey);
+        if (localData) {
+            try {
+                this.data = JSON.parse(localData);
+            } catch (e) {
+                this.data = this.getDefaultStructure();
+            }
+        } else {
+            this.data = this.getDefaultStructure();
+        }
+        return this.data;
+    }
+
+    getDefaultStructure() {
+        return {
+            views: {},
+            bookmarks: {},
+            statistics: {
+                totalViews: 0,
+                lastUpdated: new Date().toISOString()
+            }
+        };
+    }
+
+    saveToLocal() {
+        this.data.statistics.lastUpdated = new Date().toISOString();
+        localStorage.setItem(this.localKey, JSON.stringify(this.data));
+        return this.data;
+    }
+
+    // Sync with GitHub database.json
+    async syncWithGitHub() {
+        try {
+            const response = await fetch('database.json?t=' + Date.now());
+            if (response.ok) {
+                const githubData = await response.json();
+                this.mergeData(githubData);
+                this.saveToLocal();
+                console.log('Synced with GitHub database');
+            }
+        } catch (error) {
+            console.log('GitHub sync failed, using local data');
+        }
+    }
+
+    // Merge GitHub data with local data
+    mergeData(githubData) {
+        // Merge views (take maximum values)
+        for (const [scriptId, githubViews] of Object.entries(githubData.views || {})) {
+            const localViews = this.data.views[scriptId] || 0;
+            this.data.views[scriptId] = Math.max(localViews, githubViews);
+        }
+
+        // Merge bookmarks (union)
+        for (const [userId, githubBookmarks] of Object.entries(githubData.bookmarks || {})) {
+            const localBookmarks = this.data.bookmarks[userId] || [];
+            const mergedBookmarks = [...new Set([...localBookmarks, ...githubBookmarks])];
+            this.data.bookmarks[userId] = mergedBookmarks;
+        }
+
+        // Update statistics
+        this.data.statistics.totalViews = Object.values(this.data.views).reduce((a, b) => a + b, 0);
+    }
+
+    // Save to GitHub (this would require a server, but we'll prepare for future)
+    async saveToGitHub() {
+        // In a real implementation, this would commit to GitHub via API
+        // For now, we'll just log and save locally
+        console.log('Would save to GitHub:', this.data);
+        this.saveToLocal();
+    }
+
+    incrementViews(scriptId) {
+        if (!this.data.views[scriptId]) {
+            this.data.views[scriptId] = 0;
+        }
+        this.data.views[scriptId]++;
+        this.data.statistics.totalViews++;
+        
+        this.saveToLocal();
+        
+        // Try to sync with GitHub in background
+        setTimeout(() => this.syncWithGitHub(), 1000);
+        
+        return this.data.views[scriptId];
+    }
+
+    getViews(scriptId) {
+        return this.data.views[scriptId] || 0;
+    }
+
+    toggleBookmark(userId, scriptId) {
+        if (!this.data.bookmarks[userId]) {
+            this.data.bookmarks[userId] = [];
+        }
+        
+        const bookmarks = this.data.bookmarks[userId];
+        const index = bookmarks.indexOf(scriptId);
+        
+        if (index > -1) {
+            bookmarks.splice(index, 1);
+        } else {
+            bookmarks.push(scriptId);
+        }
+        
+        this.saveToLocal();
+        return bookmarks;
+    }
+
+    isBookmarked(userId, scriptId) {
+        return this.data.bookmarks[userId]?.includes(scriptId) || false;
+    }
+
+    getGlobalStats() {
+        const popularScripts = Object.entries(this.data.views)
+            .map(([scriptId, views]) => ({ scriptId: parseInt(scriptId), views }))
+            .sort((a, b) => b.views - a.views)
+            .slice(0, 5);
+
+        return {
+            totalViews: this.data.statistics.totalViews,
+            totalScripts: Object.keys(this.data.views).length,
+            popularScripts: popularScripts,
+            lastUpdated: this.data.statistics.lastUpdated
+        };
+    }
+
+    // Export data for manual backup
+    exportData() {
+        return JSON.stringify(this.data, null, 2);
+    }
+
+    // Import data from backup
+    importData(jsonData) {
+        try {
+            const imported = JSON.parse(jsonData);
+            this.data = { ...this.getDefaultStructure(), ...imported };
+            this.saveToLocal();
+            return true;
+        } catch (e) {
+            console.error('Invalid backup data');
+            return false;
+        }
+    }
+}
+
+// Initialize database
+const clientDB = new ClientDatabase();
+
+// Update all functions to use clientDB instead of database object
+
+// Replace the incrementViews function:
+async function incrementViews(scriptId) {
+    const views = clientDB.incrementViews(scriptId);
+    updateQuickStats();
+    return views;
+}
+
+// Replace getViews function:
+function getViews(scriptId) {
+    return clientDB.getViews(scriptId);
+}
+
+// Replace toggleBookmark function:
+function toggleBookmark(scriptId) {
+    const userId = 'default_user'; // For GitHub Pages, use a single user
+    clientDB.toggleBookmark(userId, scriptId);
+    
+    if (currentCategory === 'bookmarked') {
+        filterScripts('bookmarked');
+    } else {
     <div class="bg-effects">
         <div class="bg-grid"></div>
     </div>
