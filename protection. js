@@ -1,0 +1,332 @@
+(function() {
+    'use strict';
+
+    // 1. ЗАЩИТА ОТ ПРАВОГО КЛИКА
+    document.addEventListener('contextmenu', function(e) {
+        e.preventDefault();
+        showAlert('⛔ Правый клик отключен');
+        return false;
+    });
+
+    // 2. ЗАЩИТА ОТ КОПИРОВАНИЯ
+    document.addEventListener('copy', function(e) {
+        e.preventDefault();
+        showAlert('⛔ Копирование запрещено');
+        return false;
+    });
+
+    document.addEventListener('cut', function(e) {
+        e.preventDefault();
+        return false;
+    });
+
+    // 3. БЛОКИРОВКА ГОРЯЧИХ КЛАВИШ
+    document.addEventListener('keydown', function(e) {
+        // F12
+        if (e.keyCode === 123) {
+            e.preventDefault();
+            showAlert('⛔ F12 заблокирован');
+            return false;
+        }
+        
+        // Ctrl+Shift+I (DevTools)
+        if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
+            e.preventDefault();
+            showAlert('⛔ DevTools заблокированы');
+            return false;
+        }
+        
+        // Ctrl+Shift+J (Console)
+        if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
+            e.preventDefault();
+            showAlert('⛔ Консоль заблокирована');
+            return false;
+        }
+        
+        // Ctrl+U (View Source)
+        if (e.ctrlKey && e.keyCode === 85) {
+            e.preventDefault();
+            showAlert('⛔ Просмотр кода заблокирован');
+            return false;
+        }
+        
+        // Ctrl+S (Save)
+        if (e.ctrlKey && e.keyCode === 83) {
+            e.preventDefault();
+            showAlert('⛔ Сохранение запрещено');
+            return false;
+        }
+        
+        // Ctrl+A (Select All)
+        if (e.ctrlKey && e.keyCode === 65) {
+            e.preventDefault();
+            return false;
+        }
+        
+        // Ctrl+C (Copy)
+        if (e.ctrlKey && e.keyCode === 67) {
+            e.preventDefault();
+            showAlert('⛔ Копирование запрещено');
+            return false;
+        }
+        
+        // Ctrl+X (Cut)
+        if (e.ctrlKey && e.keyCode === 88) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // 4. ЗАЩИТА ОТ ВЫДЕЛЕНИЯ ТЕКСТА
+    document.addEventListener('selectstart', function(e) {
+        e.preventDefault();
+        return false;
+    });
+
+    document.onselectstart = function() {
+        return false;
+    };
+
+    // 5. БЛОКИРОВКА DRAG & DROP
+    document.addEventListener('dragstart', function(e) {
+        e.preventDefault();
+        return false;
+    });
+
+    // 6. ОБНАРУЖЕНИЕ DEVTOOLS (продвинутый метод)
+    let devtoolsOpen = false;
+    const element = new Image();
+    
+    Object.defineProperty(element, 'id', {
+        get: function() {
+            devtoolsOpen = true;
+            document.body.innerHTML = `
+                <div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Arial;background:#1a1a1a;color:#fff;">
+                    <div style="text-align:center;">
+                        <h1 style="font-size:60px;margin:0;">⚠️</h1>
+                        <h2>DevTools обнаружены!</h2>
+                        <p>Закройте инструменты разработчика</p>
+                    </div>
+                </div>
+            `;
+        }
+    });
+
+    setInterval(function() {
+        console.log(element);
+        console.clear();
+    }, 1000);
+
+    // 7. ПРОВЕРКА РАЗМЕРА ОКНА (обнаружение DevTools)
+    setInterval(function() {
+        const threshold = 160;
+        if (window.outerWidth - window.innerWidth > threshold || 
+            window.outerHeight - window.innerHeight > threshold) {
+            document.body.innerHTML = `
+                <div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Arial;background:#ff4444;color:#fff;">
+                    <div style="text-align:center;">
+                        <h1 style="font-size:60px;margin:0;">🚫</h1>
+                        <h2>Доступ запрещен</h2>
+                        <p>Обнаружено изменение размера окна</p>
+                    </div>
+                </div>
+            `;
+        }
+    }, 500);
+
+    // 8. ЗАЩИТА ОТ IFRAME
+    if (window.top !== window.self) {
+        window.top.location = window.self.location;
+    }
+
+    // 9. ОТКЛЮЧЕНИЕ КОНСОЛИ
+    (function() {
+        const noop = function() {};
+        const methods = ['log', 'debug', 'info', 'warn', 'error', 'table', 'trace', 'dir', 'dirxml', 'group', 'groupCollapsed', 'groupEnd', 'clear', 'count', 'assert', 'profile', 'profileEnd'];
+        
+        for (let i = 0; i < methods.length; i++) {
+            console[methods[i]] = noop;
+        }
+    })();
+
+    // 10. DEBUGGER TRAP
+    setInterval(function() {
+        (function() {
+            return false;
+        })['constructor']('debugger')();
+    }, 50);
+
+    // 11. ЗАЩИТА ИЗОБРАЖЕНИЙ
+    window.addEventListener('load', function() {
+        const images = document.getElementsByTagName('img');
+        for (let i = 0; i < images.length; i++) {
+            images[i].addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            images[i].setAttribute('draggable', 'false');
+            images[i].style.userSelect = 'none';
+            images[i].style.pointerEvents = 'none';
+        }
+    });
+
+    // 12. ВОДЯНОЙ ЗНАК
+    function addWatermark() {
+        const watermark = document.createElement('div');
+        watermark.innerHTML = 'PROTECTED';
+        watermark.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 150px;
+            font-weight: bold;
+            color: rgba(0, 0, 0, 0.03);
+            pointer-events: none;
+            z-index: 99999;
+            user-select: none;
+            font-family: Arial, sans-serif;
+        `;
+        document.body.appendChild(watermark);
+    }
+
+    // 13. ЗАЩИТА ОТ PRINT SCREEN
+    document.addEventListener('keyup', function(e) {
+        if (e.key === 'PrintScreen') {
+            navigator.clipboard.writeText('');
+            showAlert('⛔ Скриншоты запрещены');
+        }
+    });
+
+    // 14. BLUR ПРИ СМЕНЕ ВКЛАДКИ
+    let hidden, visibilityChange;
+    if (typeof document.hidden !== 'undefined') {
+        hidden = 'hidden';
+        visibilityChange = 'visibilitychange';
+    }
+
+    document.addEventListener(visibilityChange, function() {
+        if (document[hidden]) {
+            document.body.style.filter = 'blur(10px)';
+        } else {
+            document.body.style.filter = 'none';
+        }
+    });
+
+    // 15. АНТИБОТ ЗАЩИТА
+    let humanDetected = false;
+    let interactions = 0;
+
+    document.addEventListener('mousemove', function() {
+        interactions++;
+        if (interactions > 3) humanDetected = true;
+    });
+
+    document.addEventListener('click', function() {
+        interactions++;
+        if (interactions > 1) humanDetected = true;
+    });
+
+    setTimeout(function() {
+        if (!humanDetected) {
+            document.body.innerHTML = `
+                <div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Arial;background:#ffa500;color:#000;">
+                    <div style="text-align:center;">
+                        <h1 style="font-size:60px;margin:0;">🤖</h1>
+                        <h2>Обнаружена подозрительная активность</h2>
+                        <p>Взаимодействуйте со страницей</p>
+                    </div>
+                </div>
+            `;
+        }
+    }, 5000);
+
+    // 16. ОЧИСТКА ИСХОДНИКОВ
+    setTimeout(function() {
+        const scripts = document.getElementsByTagName('script');
+        for (let i = 0; i < scripts.length; i++) {
+            if (scripts[i].src !== window.location.href) {
+                scripts[i].textContent = '';
+            }
+        }
+    }, 2000);
+
+    // 17. ЗАЩИТА ОТ ИНСПЕКТОРА ЭЛЕМЕНТОВ
+    document.addEventListener('mousedown', function(e) {
+        if (e.button === 2) {
+            e.preventDefault();
+            return false;
+        }
+    });
+
+    // 18. ФУНКЦИЯ ПОКАЗА ПРЕДУПРЕЖДЕНИЙ
+    function showAlert(message) {
+        const alert = document.createElement('div');
+        alert.textContent = message;
+        alert.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: linear-gradient(135deg, #ff4444, #cc0000);
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            z-index: 999999;
+            animation: slideIn 0.3s ease-out;
+        `;
+        
+        document.body.appendChild(alert);
+        
+        setTimeout(function() {
+            alert.style.animation = 'slideOut 0.3s ease-in';
+            setTimeout(function() {
+                document.body.removeChild(alert);
+            }, 300);
+        }, 3000);
+    }
+
+    // 19. CSS АНИМАЦИИ
+    const style = document.createElement('style');
+    style.textContent = `
+        @keyframes slideIn {
+            from { transform: translateX(400px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(400px); opacity: 0; }
+        }
+        * {
+            -webkit-touch-callout: none;
+            -webkit-user-select: none;
+            -khtml-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
+        }
+        img {
+            pointer-events: none;
+            user-select: none;
+        }
+    `;
+    document.head.appendChild(style);
+
+    // 20. ИНИЦИАЛИЗАЦИЯ ВОДЯНОГО ЗНАКА
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', addWatermark);
+    } else {
+        addWatermark();
+    }
+
+    // СООБЩЕНИЕ В КОНСОЛЬ (для тех кто все же откроет)
+    setTimeout(function() {
+        console.log('%c⛔ СТОЙ!', 'color: red; font-size: 50px; font-weight: bold;');
+        console.log('%cЭто функция браузера предназначена для разработчиков.', 'font-size: 16px;');
+        console.log('%cЕсли кто-то сказал вам скопировать и вставить что-то сюда, это мошенничество!', 'font-size: 16px; color: red;');
+    }, 100);
+
+})();
