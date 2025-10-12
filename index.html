@@ -1990,36 +1990,6 @@
 
         // Initialize
         loadScripts();
-    <!-- Protection System -->
-
-<script>
-// Добавь этот код в конец основного скрипта
-
-// Developer login trigger (Ctrl+Alt+D)
-document.addEventListener('keydown', (e) => {
-    if (e.ctrlKey && e.altKey && e.key === 'd') {
-        e.preventDefault();
-        if (typeof protection !== 'undefined' && !protection.isDeveloper) {
-            protection.showLoginModal();
-        }
-    }
-});
-
-// Обнови функцию updateQuickStats чтобы обновлять статистику для разработчика
-const originalUpdateQuickStats = updateQuickStats;
-updateQuickStats = function() {
-    originalUpdateQuickStats();
-    if (typeof protection !== 'undefined' && protection.isDeveloper) {
-        protection.updateDatabaseStats();
-    }
-};
-
-// Добавь обработчик для кнопки закладок в разработческой панели
-function showDevLogin() {
-    if (typeof protection !== 'undefined') {
-        protection.showLoginModal();
-    }
-}
-</script>
+    </script>
 </body>
 </html>
