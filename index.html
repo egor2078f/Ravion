@@ -915,47 +915,6 @@
             color: var(--text-primary);
         }
 
-        /* Admin Tools */
-        .admin-tools {
-            margin-top: 20px;
-            padding: 15px;
-            background: var(--bg-tertiary);
-            border-radius: 10px;
-            border: 1px solid var(--border);
-        }
-
-        .admin-title {
-            font-size: 0.9rem;
-            color: var(--text-secondary);
-            margin-bottom: 10px;
-            text-align: center;
-        }
-
-        .admin-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-        }
-
-        .admin-btn {
-            padding: 8px 12px;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            color: var(--text-primary);
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-
-        .admin-btn:hover {
-            background: var(--border);
-        }
-
         /* Responsive */
         @media (max-width: 768px) {
             .nav {
@@ -1027,25 +986,15 @@
                 justify-content: center;
             }
 
-            .admin-buttons {
+            .footer-links {
                 flex-direction: column;
-                align-items: center;
-            }
-
-            .admin-btn {
-                width: 200px;
-                justify-content: center;
+                gap: 1rem;
             }
         }
 
         @media (max-width: 480px) {
             .stats {
                 grid-template-columns: 1fr;
-            }
-
-            .footer-links {
-                flex-direction: column;
-                gap: 1rem;
             }
 
             .hero-title {
@@ -1230,26 +1179,6 @@
                     <a href="#" class="footer-link">Scripts</a>
                     <a href="#" class="footer-link" id="bookmarksLink">Bookmarks</a>
                 </div>
-                
-                <div class="admin-tools">
-                    <div class="admin-title">Database Tools</div>
-                    <div class="admin-buttons">
-                        <button class="admin-btn" onclick="syncDatabase()">
-                            <i class="fas fa-sync"></i> Sync with GitHub
-                        </button>
-                        <button class="admin-btn" onclick="backupDatabase()">
-                            <i class="fas fa-download"></i> Download Backup
-                        </button>
-                        <label class="admin-btn" style="cursor: pointer;">
-                            <i class="fas fa-upload"></i> Import Backup
-                            <input type="file" accept=".json" onchange="importDatabase(event)" style="display: none;">
-                        </label>
-                        <button class="admin-btn" onclick="clearDatabase()">
-                            <i class="fas fa-trash"></i> Clear Local Data
-                        </button>
-                    </div>
-                </div>
-                
                 <p>&copy; 2025 RAVION SCRIPTS. All rights reserved.</p>
             </div>
         </div>
@@ -1304,42 +1233,6 @@
                 return this.data;
             }
 
-            // Sync with GitHub database.json
-            async syncWithGitHub() {
-                try {
-                    const response = await fetch('database.json?t=' + Date.now());
-                    if (response.ok) {
-                        const githubData = await response.json();
-                        this.mergeData(githubData);
-                        this.saveToLocal();
-                        console.log('Synced with GitHub database');
-                        return true;
-                    }
-                } catch (error) {
-                    console.log('GitHub sync failed, using local data');
-                }
-                return false;
-            }
-
-            // Merge GitHub data with local data
-            mergeData(githubData) {
-                // Merge views (take maximum values)
-                for (const [scriptId, githubViews] of Object.entries(githubData.views || {})) {
-                    const localViews = this.data.views[scriptId] || 0;
-                    this.data.views[scriptId] = Math.max(localViews, githubViews);
-                }
-
-                // Merge bookmarks (union)
-                for (const [userId, githubBookmarks] of Object.entries(githubData.bookmarks || {})) {
-                    const localBookmarks = this.data.bookmarks[userId] || [];
-                    const mergedBookmarks = [...new Set([...localBookmarks, ...githubBookmarks])];
-                    this.data.bookmarks[userId] = mergedBookmarks;
-                }
-
-                // Update statistics
-                this.data.statistics.totalViews = Object.values(this.data.views).reduce((a, b) => a + b, 0);
-            }
-
             incrementViews(scriptId) {
                 if (!this.data.views[scriptId]) {
                     this.data.views[scriptId] = 0;
@@ -1389,31 +1282,6 @@
                     popularScripts: popularScripts,
                     lastUpdated: this.data.statistics.lastUpdated
                 };
-            }
-
-            // Export data for manual backup
-            exportData() {
-                return JSON.stringify(this.data, null, 2);
-            }
-
-            // Import data from backup
-            importData(jsonData) {
-                try {
-                    const imported = JSON.parse(jsonData);
-                    this.data = { ...this.getDefaultStructure(), ...imported };
-                    this.saveToLocal();
-                    return true;
-                } catch (e) {
-                    console.error('Invalid backup data');
-                    return false;
-                }
-            }
-
-            // Clear all data
-            clearData() {
-                this.data = this.getDefaultStructure();
-                this.saveToLocal();
-                return true;
             }
         }
 
@@ -2011,63 +1879,6 @@
             }
         }
 
-        // Database management functions
-        async function syncDatabase() {
-            showNotification('Syncing with GitHub...');
-            const success = await clientDB.syncWithGitHub();
-            if (success) {
-                updateQuickStats();
-                if (currentCategory === 'popular' || currentSort === 'views') {
-                    filterScripts(currentCategory);
-                }
-                showNotification('Database synced with GitHub!');
-            } else {
-                showNotification('Sync failed - using local data');
-            }
-        }
-
-        function backupDatabase() {
-            const data = clientDB.exportData();
-            const blob = new Blob([data], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `ravion_backup_${Date.now()}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            showNotification('Backup downloaded!');
-        }
-
-        function importDatabase(event) {
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    const success = clientDB.importData(e.target.result);
-                    if (success) {
-                        updateQuickStats();
-                        filterScripts(currentCategory);
-                        showNotification('Database imported successfully!');
-                    } else {
-                        showNotification('Import failed - invalid file format!');
-                    }
-                };
-                reader.readAsText(file);
-            }
-            event.target.value = '';
-        }
-
-        function clearDatabase() {
-            if (confirm('Are you sure you want to clear all local data? This cannot be undone!')) {
-                clientDB.clearData();
-                updateQuickStats();
-                filterScripts(currentCategory);
-                showNotification('Local data cleared!');
-            }
-        }
-
         // Modal functionality
         document.getElementById('modalClose').addEventListener('click', closeModal);
         document.getElementById('closeModalBtn').addEventListener('click', closeModal);
@@ -2176,17 +1987,8 @@
             filterScripts('bookmarked');
         });
 
-        // Auto-sync on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(() => {
-                clientDB.syncWithGitHub().then(() => {
-                    updateQuickStats();
-                });
-            }, 1000);
-        });
-
         // Initialize
         loadScripts();
     </script>
 </body>
-                    </html>
+</html>
