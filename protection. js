@@ -15,8 +15,8 @@
 
     // Developer credentials (change these!)
     const DEVELOPER_CREDENTIALS = {
-        username: "ravion",
-        password: "admin2025!",
+        username: "Lurk2104",
+        password: "LURK-9DIA-QOVF-94JE",
         token: "ravion_secure_token_2025"
     };
 
