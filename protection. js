@@ -1,332 +1,411 @@
+// Protection System for RAVION SCRIPTS
 (function() {
     'use strict';
-
-    // 1. ЗАЩИТА ОТ ПРАВОГО КЛИКА
-    document.addEventListener('contextmenu', function(e) {
-        e.preventDefault();
-        showAlert('⛔ Правый клик отключен');
-        return false;
-    });
-
-    // 2. ЗАЩИТА ОТ КОПИРОВАНИЯ
-    document.addEventListener('copy', function(e) {
-        e.preventDefault();
-        showAlert('⛔ Копирование запрещено');
-        return false;
-    });
-
-    document.addEventListener('cut', function(e) {
-        e.preventDefault();
-        return false;
-    });
-
-    // 3. БЛОКИРОВКА ГОРЯЧИХ КЛАВИШ
-    document.addEventListener('keydown', function(e) {
-        // F12
-        if (e.keyCode === 123) {
-            e.preventDefault();
-            showAlert('⛔ F12 заблокирован');
-            return false;
-        }
-        
-        // Ctrl+Shift+I (DevTools)
-        if (e.ctrlKey && e.shiftKey && e.keyCode === 73) {
-            e.preventDefault();
-            showAlert('⛔ DevTools заблокированы');
-            return false;
-        }
-        
-        // Ctrl+Shift+J (Console)
-        if (e.ctrlKey && e.shiftKey && e.keyCode === 74) {
-            e.preventDefault();
-            showAlert('⛔ Консоль заблокирована');
-            return false;
-        }
-        
-        // Ctrl+U (View Source)
-        if (e.ctrlKey && e.keyCode === 85) {
-            e.preventDefault();
-            showAlert('⛔ Просмотр кода заблокирован');
-            return false;
-        }
-        
-        // Ctrl+S (Save)
-        if (e.ctrlKey && e.keyCode === 83) {
-            e.preventDefault();
-            showAlert('⛔ Сохранение запрещено');
-            return false;
-        }
-        
-        // Ctrl+A (Select All)
-        if (e.ctrlKey && e.keyCode === 65) {
-            e.preventDefault();
-            return false;
-        }
-        
-        // Ctrl+C (Copy)
-        if (e.ctrlKey && e.keyCode === 67) {
-            e.preventDefault();
-            showAlert('⛔ Копирование запрещено');
-            return false;
-        }
-        
-        // Ctrl+X (Cut)
-        if (e.ctrlKey && e.keyCode === 88) {
-            e.preventDefault();
-            return false;
-        }
-    });
-
-    // 4. ЗАЩИТА ОТ ВЫДЕЛЕНИЯ ТЕКСТА
-    document.addEventListener('selectstart', function(e) {
-        e.preventDefault();
-        return false;
-    });
-
-    document.onselectstart = function() {
-        return false;
+    
+    // Protection configuration
+    const PROTECTION_CONFIG = {
+        debugMode: false,
+        blockDevTools: true,
+        blockRightClick: true,
+        blockCopy: false, // Allow copy for scripts
+        blockF12: true,
+        blockCtrlKeys: true,
+        userAgentCheck: true
     };
 
-    // 5. БЛОКИРОВКА DRAG & DROP
-    document.addEventListener('dragstart', function(e) {
-        e.preventDefault();
-        return false;
-    });
+    // Developer credentials (change these!)
+    const DEVELOPER_CREDENTIALS = {
+        username: "ravion",
+        password: "admin2025!",
+        token: "ravion_secure_token_2025"
+    };
 
-    // 6. ОБНАРУЖЕНИЕ DEVTOOLS (продвинутый метод)
-    let devtoolsOpen = false;
-    const element = new Image();
-    
-    Object.defineProperty(element, 'id', {
-        get: function() {
-            devtoolsOpen = true;
-            document.body.innerHTML = `
-                <div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Arial;background:#1a1a1a;color:#fff;">
-                    <div style="text-align:center;">
-                        <h1 style="font-size:60px;margin:0;">⚠️</h1>
-                        <h2>DevTools обнаружены!</h2>
-                        <p>Закройте инструменты разработчика</p>
-                    </div>
-                </div>
-            `;
+    // Protection functions
+    class SiteProtection {
+        constructor() {
+            this.isDeveloper = false;
+            this.init();
         }
-    });
 
-    setInterval(function() {
-        console.log(element);
-        console.clear();
-    }, 1000);
-
-    // 7. ПРОВЕРКА РАЗМЕРА ОКНА (обнаружение DevTools)
-    setInterval(function() {
-        const threshold = 160;
-        if (window.outerWidth - window.innerWidth > threshold || 
-            window.outerHeight - window.innerHeight > threshold) {
-            document.body.innerHTML = `
-                <div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Arial;background:#ff4444;color:#fff;">
-                    <div style="text-align:center;">
-                        <h1 style="font-size:60px;margin:0;">🚫</h1>
-                        <h2>Доступ запрещен</h2>
-                        <p>Обнаружено изменение размера окна</p>
-                    </div>
-                </div>
-            `;
+        init() {
+            this.checkUserAgent();
+            this.setupEventListeners();
+            this.setupDeveloperAuth();
+            this.log('Protection system initialized');
         }
-    }, 500);
 
-    // 8. ЗАЩИТА ОТ IFRAME
-    if (window.top !== window.self) {
-        window.top.location = window.self.location;
-    }
+        // Check for bots and suspicious user agents
+        checkUserAgent() {
+            if (!PROTECTION_CONFIG.userAgentCheck) return;
 
-    // 9. ОТКЛЮЧЕНИЕ КОНСОЛИ
-    (function() {
-        const noop = function() {};
-        const methods = ['log', 'debug', 'info', 'warn', 'error', 'table', 'trace', 'dir', 'dirxml', 'group', 'groupCollapsed', 'groupEnd', 'clear', 'count', 'assert', 'profile', 'profileEnd'];
-        
-        for (let i = 0; i < methods.length; i++) {
-            console[methods[i]] = noop;
-        }
-    })();
+            const userAgent = navigator.userAgent.toLowerCase();
+            const blockedPatterns = [
+                'bot', 'crawler', 'spider', 'scraper',
+                'curl', 'wget', 'python', 'java',
+                'phantom', 'headless', 'selenium'
+            ];
 
-    // 10. DEBUGGER TRAP
-    setInterval(function() {
-        (function() {
-            return false;
-        })['constructor']('debugger')();
-    }, 50);
+            const isBlocked = blockedPatterns.some(pattern => 
+                userAgent.includes(pattern)
+            );
 
-    // 11. ЗАЩИТА ИЗОБРАЖЕНИЙ
-    window.addEventListener('load', function() {
-        const images = document.getElementsByTagName('img');
-        for (let i = 0; i < images.length; i++) {
-            images[i].addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                return false;
-            });
-            images[i].setAttribute('draggable', 'false');
-            images[i].style.userSelect = 'none';
-            images[i].style.pointerEvents = 'none';
-        }
-    });
-
-    // 12. ВОДЯНОЙ ЗНАК
-    function addWatermark() {
-        const watermark = document.createElement('div');
-        watermark.innerHTML = 'PROTECTED';
-        watermark.style.cssText = `
-            position: fixed;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 150px;
-            font-weight: bold;
-            color: rgba(0, 0, 0, 0.03);
-            pointer-events: none;
-            z-index: 99999;
-            user-select: none;
-            font-family: Arial, sans-serif;
-        `;
-        document.body.appendChild(watermark);
-    }
-
-    // 13. ЗАЩИТА ОТ PRINT SCREEN
-    document.addEventListener('keyup', function(e) {
-        if (e.key === 'PrintScreen') {
-            navigator.clipboard.writeText('');
-            showAlert('⛔ Скриншоты запрещены');
-        }
-    });
-
-    // 14. BLUR ПРИ СМЕНЕ ВКЛАДКИ
-    let hidden, visibilityChange;
-    if (typeof document.hidden !== 'undefined') {
-        hidden = 'hidden';
-        visibilityChange = 'visibilitychange';
-    }
-
-    document.addEventListener(visibilityChange, function() {
-        if (document[hidden]) {
-            document.body.style.filter = 'blur(10px)';
-        } else {
-            document.body.style.filter = 'none';
-        }
-    });
-
-    // 15. АНТИБОТ ЗАЩИТА
-    let humanDetected = false;
-    let interactions = 0;
-
-    document.addEventListener('mousemove', function() {
-        interactions++;
-        if (interactions > 3) humanDetected = true;
-    });
-
-    document.addEventListener('click', function() {
-        interactions++;
-        if (interactions > 1) humanDetected = true;
-    });
-
-    setTimeout(function() {
-        if (!humanDetected) {
-            document.body.innerHTML = `
-                <div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:Arial;background:#ffa500;color:#000;">
-                    <div style="text-align:center;">
-                        <h1 style="font-size:60px;margin:0;">🤖</h1>
-                        <h2>Обнаружена подозрительная активность</h2>
-                        <p>Взаимодействуйте со страницей</p>
-                    </div>
-                </div>
-            `;
-        }
-    }, 5000);
-
-    // 16. ОЧИСТКА ИСХОДНИКОВ
-    setTimeout(function() {
-        const scripts = document.getElementsByTagName('script');
-        for (let i = 0; i < scripts.length; i++) {
-            if (scripts[i].src !== window.location.href) {
-                scripts[i].textContent = '';
+            if (isBlocked) {
+                this.blockAccess('Suspicious user agent detected');
             }
         }
-    }, 2000);
 
-    // 17. ЗАЩИТА ОТ ИНСПЕКТОРА ЭЛЕМЕНТОВ
-    document.addEventListener('mousedown', function(e) {
-        if (e.button === 2) {
+        // Setup event listeners for protection
+        setupEventListeners() {
+            // Block right-click
+            if (PROTECTION_CONFIG.blockRightClick) {
+                document.addEventListener('contextmenu', (e) => {
+                    e.preventDefault();
+                    this.log('Right-click blocked');
+                    return false;
+                });
+            }
+
+            // Block F12 and developer tools
+            if (PROTECTION_CONFIG.blockF12 || PROTECTION_CONFIG.blockDevTools) {
+                document.addEventListener('keydown', (e) => {
+                    // Block F12
+                    if (PROTECTION_CONFIG.blockF12 && e.key === 'F12') {
+                        e.preventDefault();
+                        this.log('F12 blocked');
+                        return false;
+                    }
+
+                    // Block Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+                    if (PROTECTION_CONFIG.blockDevTools && e.ctrlKey && e.shiftKey) {
+                        if (['I', 'J', 'C'].includes(e.key)) {
+                            e.preventDefault();
+                            this.log('Developer tools shortcut blocked');
+                            return false;
+                        }
+                    }
+
+                    // Block Ctrl+U (view source)
+                    if (PROTECTION_CONFIG.blockCtrlKeys && e.ctrlKey && e.key === 'u') {
+                        e.preventDefault();
+                        this.log('View source blocked');
+                        return false;
+                    }
+                });
+            }
+
+            // Detect developer tools opening
+            if (PROTECTION_CONFIG.blockDevTools) {
+                this.detectDevTools();
+            }
+        }
+
+        // Detect developer tools
+        detectDevTools() {
+            const element = new Image();
+            Object.defineProperty(element, 'id', {
+                get: function() {
+                    throw new Error('Dev tools detected');
+                }
+            });
+
+            setInterval(() => {
+                try {
+                    console.log(element);
+                    console.clear();
+                } catch (error) {
+                    this.blockAccess('Developer tools detected');
+                }
+            }, 1000);
+        }
+
+        // Developer authentication system
+        setupDeveloperAuth() {
+            // Check if developer is already logged in
+            const devToken = localStorage.getItem('dev_token');
+            if (devToken === DEVELOPER_CREDENTIALS.token) {
+                this.isDeveloper = true;
+                this.log('Developer authenticated');
+                this.showDeveloperPanel();
+            }
+        }
+
+        // Show developer login modal
+        showLoginModal() {
+            const modalHTML = `
+                <div id="devLoginModal" style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0,0,0,0.8);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 10000;
+                ">
+                    <div style="
+                        background: #111;
+                        padding: 2rem;
+                        border-radius: 12px;
+                        border: 1px solid #333;
+                        width: 90%;
+                        max-width: 400px;
+                    ">
+                        <h3 style="color: #fff; margin-bottom: 1rem; text-align: center;">
+                            Developer Login
+                        </h3>
+                        <form id="devLoginForm">
+                            <div style="margin-bottom: 1rem;">
+                                <input type="text" id="devUsername" placeholder="Username" 
+                                    style="width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #333; border-radius: 6px; color: #fff; margin-bottom: 1rem;">
+                                <input type="password" id="devPassword" placeholder="Password" 
+                                    style="width: 100%; padding: 12px; background: #1a1a1a; border: 1px solid #333; border-radius: 6px; color: #fff;">
+                            </div>
+                            <button type="submit" style="
+                                width: 100%; padding: 12px; background: #ff6b00; 
+                                border: none; border-radius: 6px; color: #fff; 
+                                font-weight: bold; cursor: pointer;
+                            ">Login</button>
+                        </form>
+                        <button onclick="protection.hideLoginModal()" style="
+                            width: 100%; padding: 10px; background: transparent; 
+                            border: 1px solid #333; border-radius: 6px; color: #888; 
+                            margin-top: 1rem; cursor: pointer;
+                        ">Cancel</button>
+                    </div>
+                </div>
+            `;
+
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+            
+            document.getElementById('devLoginForm').addEventListener('submit', (e) => {
+                e.preventDefault();
+                this.handleDeveloperLogin();
+            });
+        }
+
+        // Handle developer login
+        handleDeveloperLogin() {
+            const username = document.getElementById('devUsername').value;
+            const password = document.getElementById('devPassword').value;
+
+            if (username === DEVELOPER_CREDENTIALS.username && 
+                password === DEVELOPER_CREDENTIALS.password) {
+                
+                this.isDeveloper = true;
+                localStorage.setItem('dev_token', DEVELOPER_CREDENTIALS.token);
+                this.hideLoginModal();
+                this.showDeveloperPanel();
+                this.log('Developer login successful');
+                
+            } else {
+                alert('Invalid credentials');
+            }
+        }
+
+        // Hide login modal
+        hideLoginModal() {
+            const modal = document.getElementById('devLoginModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // Show developer panel
+        showDeveloperPanel() {
+            // Add developer button to header
+            const navActions = document.querySelector('.nav-actions');
+            if (navActions && !document.getElementById('devPanelBtn')) {
+                const devButton = document.createElement('button');
+                devButton.id = 'devPanelBtn';
+                devButton.innerHTML = '<i class="fas fa-code"></i>';
+                devButton.style.background = 'none';
+                devButton.style.border = 'none';
+                devButton.style.color = '#ff6b00';
+                devButton.style.fontSize = '1.2rem';
+                devButton.style.cursor = 'pointer';
+                devButton.style.padding = '0.5rem';
+                devButton.style.borderRadius = '8px';
+                devButton.title = 'Developer Panel';
+                
+                devButton.addEventListener('click', () => {
+                    this.toggleDeveloperPanel();
+                });
+
+                navActions.insertBefore(devButton, navActions.firstChild);
+            }
+
+            // Add developer panel to footer
+            if (!document.getElementById('devPanel')) {
+                const devPanelHTML = `
+                    <div id="devPanel" style="
+                        margin-top: 2rem; padding: 1.5rem; background: #1a1a1a; 
+                        border-radius: 10px; border: 1px solid #333; display: none;
+                    ">
+                        <h4 style="color: #ff6b00; margin-bottom: 1rem;">
+                            <i class="fas fa-shield-alt"></i> Developer Panel
+                        </h4>
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; margin-bottom: 1rem;">
+                            <div style="background: #111; padding: 1rem; border-radius: 6px; border: 1px solid #333;">
+                                <div style="color: #888; font-size: 0.8rem;">Database Stats</div>
+                                <div style="color: #fff; font-size: 1.2rem; font-weight: bold;" id="dbStats">Loading...</div>
+                            </div>
+                            <div style="background: #111; padding: 1rem; border-radius: 6px; border: 1px solid #333;">
+                                <div style="color: #888; font-size: 0.8rem;">Protection Status</div>
+                                <div style="color: #00ff00; font-size: 1.2rem; font-weight: bold;">ACTIVE</div>
+                            </div>
+                        </div>
+                        <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                            <button onclick="protection.exportDatabase()" style="
+                                padding: 8px 12px; background: #111; border: 1px solid #333; 
+                                border-radius: 6px; color: #fff; cursor: pointer; font-size: 0.8rem;
+                            "><i class="fas fa-download"></i> Export DB</button>
+                            <button onclick="protection.clearDatabase()" style="
+                                padding: 8px 12px; background: #111; border: 1px solid #333; 
+                                border-radius: 6px; color: #ff4757; cursor: pointer; font-size: 0.8rem;
+                            "><i class="fas fa-trash"></i> Clear DB</button>
+                            <button onclick="protection.logout()" style="
+                                padding: 8px 12px; background: #111; border: 1px solid #333; 
+                                border-radius: 6px; color: #888; cursor: pointer; font-size: 0.8rem;
+                            "><i class="fas fa-sign-out-alt"></i> Logout</button>
+                        </div>
+                    </div>
+                `;
+
+                const footerContent = document.querySelector('.footer-content');
+                if (footerContent) {
+                    footerContent.insertAdjacentHTML('beforeend', devPanelHTML);
+                }
+            }
+        }
+
+        // Toggle developer panel
+        toggleDeveloperPanel() {
+            const panel = document.getElementById('devPanel');
+            if (panel) {
+                panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+                this.updateDatabaseStats();
+            }
+        }
+
+        // Update database statistics
+        updateDatabaseStats() {
+            if (!this.isDeveloper) return;
+
+            try {
+                const dbData = JSON.parse(localStorage.getItem('ravion_database') || '{}');
+                const totalViews = Object.values(dbData.views || {}).reduce((a, b) => a + b, 0);
+                const totalScripts = Object.keys(dbData.views || {}).length;
+
+                const statsElement = document.getElementById('dbStats');
+                if (statsElement) {
+                    statsElement.innerHTML = `${totalViews} views<br>${totalScripts} scripts`;
+                }
+            } catch (error) {
+                console.error('Error updating DB stats:', error);
+            }
+        }
+
+        // Export database
+        exportDatabase() {
+            if (!this.isDeveloper) return;
+
+            try {
+                const dbData = localStorage.getItem('ravion_database');
+                const blob = new Blob([dbData], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `ravion_database_${Date.now()}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                this.log('Database exported');
+            } catch (error) {
+                console.error('Error exporting database:', error);
+            }
+        }
+
+        // Clear database
+        clearDatabase() {
+            if (!this.isDeveloper) return;
+
+            if (confirm('Are you sure you want to clear all database data? This cannot be undone!')) {
+                localStorage.removeItem('ravion_database');
+                this.log('Database cleared');
+                this.updateDatabaseStats();
+            }
+        }
+
+        // Developer logout
+        logout() {
+            this.isDeveloper = false;
+            localStorage.removeItem('dev_token');
+            
+            const devPanel = document.getElementById('devPanel');
+            const devButton = document.getElementById('devPanelBtn');
+            
+            if (devPanel) devPanel.remove();
+            if (devButton) devButton.remove();
+            
+            this.log('Developer logged out');
+        }
+
+        // Block access to the site
+        blockAccess(reason) {
+            if (PROTECTION_CONFIG.debugMode) {
+                this.log(`Access blocked: ${reason}`);
+                return;
+            }
+
+            document.body.innerHTML = `
+                <div style="
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: #000;
+                    color: #fff;
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    font-family: Arial, sans-serif;
+                    z-index: 99999;
+                ">
+                    <div style="text-align: center;">
+                        <h1 style="color: #ff4757; margin-bottom: 1rem;">Access Denied</h1>
+                        <p style="color: #888; margin-bottom: 2rem;">${reason}</p>
+                        <p style="color: #555;">RAVION SCRIPTS Protection System</p>
+                    </div>
+                </div>
+            `;
+
+            throw new Error(`Access blocked: ${reason}`);
+        }
+
+        // Log messages (only in debug mode)
+        log(message) {
+            if (PROTECTION_CONFIG.debugMode) {
+                console.log(`[RAVION Protection] ${message}`);
+            }
+        }
+    }
+
+    // Initialize protection system
+    window.protection = new SiteProtection();
+
+    // Add developer login trigger (Ctrl+Alt+D)
+    document.addEventListener('keydown', (e) => {
+        if (e.ctrlKey && e.altKey && e.key === 'd') {
             e.preventDefault();
-            return false;
+            if (!window.protection.isDeveloper) {
+                window.protection.showLoginModal();
+            }
         }
     });
-
-    // 18. ФУНКЦИЯ ПОКАЗА ПРЕДУПРЕЖДЕНИЙ
-    function showAlert(message) {
-        const alert = document.createElement('div');
-        alert.textContent = message;
-        alert.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #ff4444, #cc0000);
-            color: white;
-            padding: 15px 25px;
-            border-radius: 8px;
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            font-weight: bold;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-            z-index: 999999;
-            animation: slideIn 0.3s ease-out;
-        `;
-        
-        document.body.appendChild(alert);
-        
-        setTimeout(function() {
-            alert.style.animation = 'slideOut 0.3s ease-in';
-            setTimeout(function() {
-                document.body.removeChild(alert);
-            }, 300);
-        }, 3000);
-    }
-
-    // 19. CSS АНИМАЦИИ
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes slideIn {
-            from { transform: translateX(400px); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        @keyframes slideOut {
-            from { transform: translateX(0); opacity: 1; }
-            to { transform: translateX(400px); opacity: 0; }
-        }
-        * {
-            -webkit-touch-callout: none;
-            -webkit-user-select: none;
-            -khtml-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-        img {
-            pointer-events: none;
-            user-select: none;
-        }
-    `;
-    document.head.appendChild(style);
-
-    // 20. ИНИЦИАЛИЗАЦИЯ ВОДЯНОГО ЗНАКА
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', addWatermark);
-    } else {
-        addWatermark();
-    }
-
-    // СООБЩЕНИЕ В КОНСОЛЬ (для тех кто все же откроет)
-    setTimeout(function() {
-        console.log('%c⛔ СТОЙ!', 'color: red; font-size: 50px; font-weight: bold;');
-        console.log('%cЭто функция браузера предназначена для разработчиков.', 'font-size: 16px;');
-        console.log('%cЕсли кто-то сказал вам скопировать и вставить что-то сюда, это мошенничество!', 'font-size: 16px; color: red;');
-    }, 100);
 
 })();
