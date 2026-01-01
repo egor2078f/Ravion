@@ -1,1995 +1,389 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAVION | Scripts</title>
+    <title>RAVION Scripts</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="protection.js"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-vsc-dark-plus.min.css" rel="stylesheet" />
+
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
+        :root {
+            --bg-body: #0d1117; /* Цвет фона GitHub Dark */
+            --bg-card: #161b22;
+            --border: #30363d;
+            --text-main: #c9d1d9;
+            --text-muted: #8b949e;
+            --accent: #58a6ff; /* Синий акцент */
+            --accent-hover: #79c0ff;
+            --radius: 6px;
         }
 
-        :root {
-            --bg-primary: #0a0a0a;
-            --bg-secondary: #111111;
-            --bg-tertiary: #1a1a1a;
-            --accent: #ffffff;
-            --text-primary: #ffffff;
-            --text-secondary: #888888;
-            --text-tertiary: #555555;
-            --border: #222222;
-            --success: #00ff00;
-            --universal: #ff6b00;
-            --highlight: #ffff00;
-            --views: #4dabf7;
-            --bookmark: #ff4757;
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-            background-color: var(--bg-primary);
-            color: var(--text-primary);
-            line-height: 1.6;
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-
-        /* Background Effects */
-        .bg-effects {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            z-index: -1;
-            pointer-events: none;
-        }
-
-        .bg-grid {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-image: 
-                linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
-            background-size: 50px 50px;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            line-height: 1.5;
         }
 
         /* Header */
-        .header {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: rgba(10, 10, 10, 0.95);
-            backdrop-filter: blur(20px);
+        header {
+            background: var(--bg-card);
             border-bottom: 1px solid var(--border);
-            z-index: 1000;
             padding: 1rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
         }
 
-        .nav {
+        .container {
             max-width: 1200px;
             margin: 0 auto;
-            padding: 0 2rem;
+            padding: 0 20px;
+        }
+
+        .nav-flex {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
         .logo {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--text-primary);
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-main);
             text-decoration: none;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
+            gap: 10px;
         }
 
-        .logo-icon {
-            color: var(--accent);
-        }
-
-        .nav-actions {
+        /* Search Area */
+        .controls {
+            margin: 2rem 0;
             display: flex;
             gap: 1rem;
-            align-items: center;
-        }
-
-        .theme-toggle {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1.2rem;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .theme-toggle:hover {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-        }
-
-        /* Main Content */
-        .main {
-            margin-top: 80px;
-            min-height: calc(100vh - 80px);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 2rem;
-        }
-
-        /* Hero Section */
-        .hero {
-            text-align: center;
-            padding: 6rem 0 4rem;
-            position: relative;
-        }
-
-        .hero-title {
-            font-size: clamp(3rem, 8vw, 6rem);
-            font-weight: 800;
-            margin-bottom: 1rem;
-            background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            line-height: 1.1;
-        }
-
-        .hero-subtitle {
-            font-size: clamp(1.1rem, 3vw, 1.5rem);
-            color: var(--text-secondary);
-            max-width: 600px;
-            margin: 0 auto 3rem;
-            font-weight: 400;
-        }
-
-        /* Quick Stats */
-        .quick-stats {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 3rem;
             flex-wrap: wrap;
-        }
-
-        .quick-stat {
-            text-align: center;
-            padding: 1rem 2rem;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-        }
-
-        .quick-stat-number {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-        }
-
-        .quick-stat-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        /* Search Section */
-        .search-section {
-            max-width: 700px;
-            margin: 0 auto 2rem;
-            position: relative;
-        }
-
-        .search-container {
-            position: relative;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 1.5rem;
-            transition: all 0.3s ease;
-        }
-
-        .search-container:focus-within {
-            border-color: var(--text-secondary);
-            box-shadow: 0 0 0 2px rgba(255,255,255,0.1);
-        }
-
-        .search-label {
-            display: block;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            font-weight: 600;
-            margin-bottom: 0.5rem;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .search-input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .search-icon {
-            position: absolute;
-            left: 1rem;
-            color: var(--text-tertiary);
-            font-size: 1.1rem;
         }
 
         .search-input {
-            width: 100%;
-            padding: 1rem 1rem 1rem 3rem;
-            background: var(--bg-tertiary);
+            flex: 1;
+            background: var(--bg-body);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text-primary);
-            font-size: 1.1rem;
-            outline: none;
-            transition: all 0.3s ease;
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: var(--radius);
+            font-family: inherit;
+            min-width: 250px;
         }
 
         .search-input:focus {
-            border-color: var(--text-secondary);
-        }
-
-        .search-input::placeholder {
-            color: var(--text-tertiary);
-        }
-
-        /* Search Suggestions */
-        .search-suggestions {
-            position: absolute;
-            top: 100%;
-            left: 0;
-            right: 0;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            margin-top: 5px;
-            max-height: 200px;
-            overflow-y: auto;
-            z-index: 100;
-            display: none;
-        }
-
-        .search-suggestions.active {
-            display: block;
-        }
-
-        .suggestion-item {
-            padding: 12px 16px;
-            cursor: pointer;
-            border-bottom: 1px solid var(--border);
-            transition: background-color 0.2s ease;
-        }
-
-        .suggestion-item:hover {
-            background: var(--bg-tertiary);
-        }
-
-        .suggestion-item:last-child {
-            border-bottom: none;
-        }
-
-        .suggestion-highlight {
-            color: var(--highlight);
-            font-weight: 600;
-        }
-
-        /* Search Tips */
-        .search-tips {
-            text-align: center;
-            color: var(--text-tertiary);
-            font-size: 0.9rem;
-            margin-top: 1rem;
-        }
-
-        .search-tip {
-            display: inline-block;
-            margin: 0 0.5rem;
-            padding: 0.3rem 0.8rem;
-            background: var(--bg-tertiary);
-            border-radius: 15px;
-            border: 1px solid var(--border);
-        }
-
-        /* Search Results Info */
-        .search-results-info {
-            text-align: center;
-            color: var(--text-secondary);
-            margin: 1rem 0;
-            font-size: 0.9rem;
-        }
-
-        .relevance-badge {
-            display: inline-block;
-            padding: 0.2rem 0.6rem;
-            background: var(--success);
-            color: var(--bg-primary);
-            border-radius: 10px;
-            font-size: 0.7rem;
-            font-weight: 600;
-            margin-left: 0.5rem;
-        }
-
-        /* Filters Section */
-        .filters-section {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 2rem;
-            flex-wrap: wrap;
-            gap: 1rem;
-        }
-
-        .category-filter {
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .category-btn {
-            padding: 0.75rem 1.5rem;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 25px;
-            color: var(--text-secondary);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .category-btn:hover {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-        }
-
-        .category-btn.active {
-            background: var(--accent);
-            color: var(--bg-primary);
+            outline: none;
             border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
         }
 
-        .category-btn.universal {
-            border-color: var(--universal);
-        }
-
-        .category-btn.universal.active {
-            background: var(--universal);
-            color: var(--bg-primary);
-        }
-
-        .sort-filter {
-            display: flex;
-            gap: 0.5rem;
-            align-items: center;
-        }
-
-        .sort-select {
-            padding: 0.75rem 1rem;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-
-        /* Tags Cloud */
-        .tags-cloud {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 2rem;
-            justify-content: center;
-        }
-
-        .tag {
-            padding: 0.5rem 1rem;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .tag:hover {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            transform: translateY(-2px);
-        }
-
-        .tag.active {
-            background: var(--accent);
-            color: var(--bg-primary);
-            border-color: var(--accent);
-        }
-
-        /* Stats */
-        .stats {
+        /* Grid */
+        .grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 2rem;
-            margin: 3rem 0;
-        }
-
-        .stat-card {
-            text-align: center;
-            padding: 2rem;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 16px;
-            transition: transform 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-5px);
-        }
-
-        .stat-number {
-            font-size: 2.5rem;
-            font-weight: 800;
-            color: var(--accent);
-            margin-bottom: 0.5rem;
-        }
-
-        .stat-label {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        /* Scripts Section */
-        .scripts-section {
-            margin: 3rem 0;
-        }
-
-        .section-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            margin-bottom: 2rem;
-            padding-bottom: 1rem;
-            border-bottom: 1px solid var(--border);
-        }
-
-        .section-title {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .section-subtitle {
-            color: var(--text-secondary);
-            font-size: 1.1rem;
-        }
-
-        .scripts-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
             gap: 1.5rem;
             margin-bottom: 3rem;
         }
 
-        .script-card {
-            background: var(--bg-secondary);
+        .card {
+            background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 16px;
-            padding: 2rem;
-            transition: all 0.3s ease;
-            position: relative;
-            overflow: hidden;
+            border-radius: var(--radius);
+            padding: 1.5rem;
+            display: flex;
+            flex-direction: column;
+            transition: border-color 0.2s;
         }
 
-        .script-card.universal {
-            border-color: var(--universal);
+        .card:hover {
+            border-color: var(--text-muted);
         }
 
-        .script-card.popular {
-            border-color: var(--views);
-        }
-
-        .script-card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.02), transparent);
-            transition: left 0.6s ease;
-        }
-
-        .script-card.universal::before {
-            background: linear-gradient(90deg, transparent, rgba(255,107,0,0.05), transparent);
-        }
-
-        .script-card.popular::before {
-            background: linear-gradient(90deg, transparent, rgba(77,171,247,0.05), transparent);
-        }
-
-        .script-card:hover::before {
-            left: 100%;
-        }
-
-        .script-card:hover {
-            border-color: var(--text-secondary);
-            transform: translateY(-5px);
-        }
-
-        .script-card.universal:hover {
-            border-color: var(--universal);
-        }
-
-        .script-card.popular:hover {
-            border-color: var(--views);
-        }
-
-        .script-header {
+        .card-top {
             display: flex;
             justify-content: space-between;
             align-items: flex-start;
-            margin-bottom: 1rem;
-        }
-
-        .script-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--text-primary);
             margin-bottom: 0.5rem;
         }
 
-        .script-game {
-            color: var(--accent);
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-
-        .script-card.universal .script-game {
-            color: var(--universal);
-        }
-
-        .script-badge {
-            background: var(--bg-tertiary);
-            color: var(--text-secondary);
-            padding: 0.3rem 0.8rem;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-        }
-
-        .script-card.universal .script-badge {
-            background: var(--universal);
-            color: var(--bg-primary);
-        }
-
-        .script-card.popular .script-badge {
-            background: var(--views);
-            color: var(--bg-primary);
-        }
-
-        .script-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-            font-size: 0.8rem;
-            color: var(--text-tertiary);
-        }
-
-        .script-stats {
-            display: flex;
-            gap: 1rem;
-            align-items: center;
-        }
-
-        .stat {
-            display: flex;
-            align-items: center;
-            gap: 0.3rem;
-            font-size: 0.8rem;
-        }
-
-        .views {
-            color: var(--views);
-        }
-
-        .bookmark-btn {
-            background: none;
-            border: none;
-            color: var(--text-tertiary);
-            cursor: pointer;
-            font-size: 1.1rem;
-            transition: all 0.3s ease;
-            padding: 0.3rem;
-        }
-
-        .bookmark-btn:hover {
-            color: var(--bookmark);
-            transform: scale(1.1);
-        }
-
-        .bookmark-btn.bookmarked {
-            color: var(--bookmark);
-        }
-
-        .script-description {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 1rem;
-        }
-
-        .script-tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .script-tag {
-            padding: 0.3rem 0.6rem;
-            background: var(--bg-tertiary);
+        .game-label {
+            font-size: 12px;
+            color: var(--text-muted);
             border: 1px solid var(--border);
-            border-radius: 12px;
-            color: var(--text-secondary);
-            font-size: 0.7rem;
-            cursor: pointer;
-            transition: all 0.3s ease;
+            padding: 2px 8px;
+            border-radius: 20px;
         }
 
-        .script-tag:hover {
-            background: var(--border);
-            color: var(--text-primary);
+        .card h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #58a6ff;
+            margin-bottom: 0.5rem;
         }
 
-        .script-actions {
-            display: flex;
-            gap: 0.75rem;
+        .card p {
+            color: var(--text-muted);
+            font-size: 13px;
+            margin-bottom: 1.5rem;
+            flex-grow: 1;
         }
 
         .btn {
-            padding: 0.75rem 1.5rem;
-            border: none;
-            border-radius: 10px;
-            font-size: 0.9rem;
-            font-weight: 600;
+            background: #21262d;
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 6px 12px;
+            border-radius: var(--radius);
             cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
+            font-size: 13px;
+            font-weight: 500;
+            transition: 0.2s;
             text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            justify-content: center;
+        }
+
+        .btn:hover {
+            background: #30363d;
+            border-color: #8b949e;
         }
 
         .btn-primary {
-            background: var(--accent);
-            color: var(--bg-primary);
+            background: #238636;
+            border-color: rgba(240,246,252,0.1);
+            color: white;
+            width: 100%;
         }
 
         .btn-primary:hover {
-            background: #e0e0e0;
-            transform: translateY(-2px);
+            background: #2ea043;
         }
 
-        .btn-secondary {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-            border: 1px solid var(--border);
-        }
-
-        .btn-secondary:hover {
-            background: var(--border);
-            transform: translateY(-2px);
-        }
-
-        .btn-success {
-            background: var(--success);
-            color: var(--bg-primary);
-        }
-
-        .btn-success:hover {
-            background: #00cc00;
-            transform: translateY(-2px);
-        }
-
-        /* Pagination */
-        .pagination {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 3rem;
-        }
-
-        .page-btn {
-            padding: 0.75rem 1rem;
-            background: var(--bg-secondary);
-            border: 1px solid var(--border);
-            border-radius: 8px;
-            color: var(--text-primary);
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 600;
-            min-width: 44px;
-            text-align: center;
-        }
-
-        .page-btn:hover {
-            background: var(--bg-tertiary);
-            border-color: var(--text-secondary);
-        }
-
-        .page-btn.active {
-            background: var(--accent);
-            color: var(--bg-primary);
-            border-color: var(--accent);
-        }
-
-        .page-btn.disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-        }
-
-        .page-btn.disabled:hover {
-            background: var(--bg-secondary);
-            border-color: var(--border);
-        }
-
-        /* Notifications */
-        .notification {
+        /* Modal */
+        .modal-overlay {
             position: fixed;
-            top: 100px;
-            right: 2rem;
-            background: var(--success);
-            color: var(--bg-primary);
-            padding: 1rem 1.5rem;
-            border-radius: 10px;
-            font-weight: 600;
-            z-index: 10000;
-            transform: translateX(400px);
-            transition: transform 0.3s ease;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-        }
-
-        .notification.show {
-            transform: translateX(0);
-        }
-
-        /* Code Modal */
-        .modal {
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.7);
             display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            z-index: 2000;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
+            z-index: 1000;
         }
 
-        .modal.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
-        .modal-content {
-            background: var(--bg-secondary);
+        .modal {
+            background: var(--bg-card);
             border: 1px solid var(--border);
-            border-radius: 20px;
-            width: 100%;
+            border-radius: var(--radius);
+            width: 90%;
             max-width: 800px;
             max-height: 80vh;
             display: flex;
             flex-direction: column;
-            overflow: hidden;
         }
 
         .modal-header {
-            padding: 1.5rem 2rem;
+            padding: 1rem;
             border-bottom: 1px solid var(--border);
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
 
-        .modal-title {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--text-primary);
-        }
-
-        .modal-close {
-            background: none;
-            border: none;
-            color: var(--text-secondary);
-            font-size: 1.5rem;
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-
-        .modal-close:hover {
-            background: var(--bg-tertiary);
-            color: var(--text-primary);
-        }
-
         .modal-body {
-            padding: 2rem;
-            overflow-y: auto;
-            flex-grow: 1;
+            overflow: auto;
+            background: #0d1117;
+            position: relative;
         }
 
-        .code-block {
-            background: var(--bg-primary);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            padding: 1.5rem;
-            font-family: 'SF Mono', 'Monaco', 'Cascadia Code', monospace;
-            font-size: 0.9rem;
-            line-height: 1.5;
-            color: var(--text-primary);
-            white-space: pre-wrap;
-            word-break: break-all;
-            max-height: 400px;
-            overflow-y: auto;
-        }
+        pre { margin: 0 !important; border-radius: 0 !important; }
 
         .modal-footer {
-            padding: 1.5rem 2rem;
+            padding: 1rem;
             border-top: 1px solid var(--border);
             display: flex;
             justify-content: flex-end;
-            gap: 1rem;
+            gap: 10px;
         }
 
-        /* No Results */
-        .no-results {
+        /* Error state */
+        .error-msg {
+            color: #f85149;
             text-align: center;
-            padding: 4rem 2rem;
-            color: var(--text-tertiary);
+            padding: 2rem;
+            border: 1px solid rgba(248, 81, 73, 0.4);
+            border-radius: var(--radius);
+            background: rgba(248, 81, 73, 0.1);
             display: none;
-        }
-
-        .no-results.active {
-            display: block;
-        }
-
-        .no-results-icon {
-            font-size: 4rem;
-            margin-bottom: 1rem;
-            opacity: 0.5;
-        }
-
-        /* Footer */
-        .footer {
-            background: var(--bg-secondary);
-            border-top: 1px solid var(--border);
-            padding: 3rem 0;
-            margin-top: 4rem;
-        }
-
-        .footer-content {
-            text-align: center;
-            color: var(--text-secondary);
-        }
-
-        .footer-links {
-            display: flex;
-            justify-content: center;
-            gap: 2rem;
-            margin-bottom: 1.5rem;
-        }
-
-        .footer-link {
-            color: var(--text-secondary);
-            text-decoration: none;
-            transition: color 0.3s ease;
-        }
-
-        .footer-link:hover {
-            color: var(--text-primary);
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .nav {
-                padding: 0 1rem;
-            }
-
-            .container {
-                padding: 0 1rem;
-            }
-
-            .hero {
-                padding: 4rem 0 2rem;
-            }
-
-            .scripts-grid {
-                grid-template-columns: 1fr;
-            }
-
-            .stats {
-                grid-template-columns: repeat(2, 1fr);
-                gap: 1rem;
-            }
-
-            .stat-card {
-                padding: 1.5rem;
-            }
-
-            .section-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 1rem;
-            }
-
-            .script-actions {
-                flex-direction: column;
-            }
-
-            .modal {
-                padding: 1rem;
-            }
-
-            .modal-content {
-                max-height: 90vh;
-            }
-
-            .pagination {
-                flex-wrap: wrap;
-            }
-
-            .category-filter {
-                gap: 0.5rem;
-            }
-
-            .category-btn {
-                padding: 0.6rem 1rem;
-                font-size: 0.8rem;
-            }
-
-            .search-tips {
-                display: none;
-            }
-
-            .filters-section {
-                flex-direction: column;
-                align-items: stretch;
-            }
-
-            .sort-filter {
-                justify-content: center;
-            }
-
-            .footer-links {
-                flex-direction: column;
-                gap: 1rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .stats {
-                grid-template-columns: 1fr;
-            }
-
-            .hero-title {
-                font-size: 2.5rem;
-            }
-
-            .quick-stats {
-                gap: 1rem;
-            }
-
-            .quick-stat {
-                padding: 0.8rem 1.2rem;
-            }
         }
     </style>
 </head>
 <body>
-    <div class="bg-effects">
-        <div class="bg-grid"></div>
-    </div>
 
-    <!-- Notification -->
-    <div class="notification" id="notification">
-        <i class="fas fa-check"></i>
-        <span id="notificationText"></span>
-    </div>
-
-    <header class="header">
-        <nav class="nav">
+    <header>
+        <div class="container nav-flex">
             <a href="#" class="logo">
-                <i class="fas fa-code logo-icon"></i>
-                RAVION
+                <i class="fas fa-code-branch"></i>
+                RAVION Repository
             </a>
-            <div class="nav-actions">
-                <button class="theme-toggle" id="themeToggle">
-                    <i class="fas fa-moon"></i>
-                </button>
+            <div style="font-size: 12px; color: var(--text-muted);">
+                Scripts v1.0
             </div>
-        </nav>
+        </div>
     </header>
 
-    <main class="main">
-        <div class="container">
-            <section class="hero">
-                <h1 class="hero-title">RAVION SCRIPTS</h1>
-                <p class="hero-subtitle">Premium Roblox scripts for enhanced gaming experience</p>
-                
-                <div class="quick-stats">
-                    <div class="quick-stat">
-                        <div class="quick-stat-number" id="totalScriptsQuick">0</div>
-                        <div class="quick-stat-label">Total Scripts</div>
-                    </div>
-                    <div class="quick-stat">
-                        <div class="quick-stat-number" id="totalViews">0</div>
-                        <div class="quick-stat-label">Total Views</div>
-                    </div>
-                    <div class="quick-stat">
-                        <div class="quick-stat-number" id="popularScripts">0</div>
-                        <div class="quick-stat-label">Popular</div>
-                    </div>
-                </div>
-            </section>
+    <main class="container">
+        <div class="controls">
+            <input type="text" class="search-input" id="searchInput" placeholder="Поиск скрипта по названию или игре...">
+        </div>
 
-            <section class="search-section">
-                <div class="search-container">
-                    <label class="search-label">Smart Search</label>
-                    <div class="search-input-wrapper">
-                        <i class="fas fa-search search-icon"></i>
-                        <input type="text" class="search-input" placeholder="Try: 'hack', 'adopt me', 'universal esp'..." id="searchInput">
-                        <div class="search-suggestions" id="searchSuggestions"></div>
-                    </div>
-                </div>
-                <div class="search-tips">
-                    <span class="search-tip">Name</span>
-                    <span class="search-tip">Game</span>
-                    <span class="search-tip">Description</span>
-                    <span class="search-tip">Tags</span>
-                </div>
-            </section>
-
-            <div class="search-results-info" id="searchResultsInfo" style="display: none;">
-                Found <span id="resultsCount">0</span> scripts <span id="relevanceInfo"></span>
+        <div id="error-box" class="error-msg"></div>
+        <div class="grid" id="grid">
+            <div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 2rem;">
+                Загрузка данных...
             </div>
-
-            <div class="tags-cloud" id="tagsCloud">
-                <!-- Tags will be loaded here -->
-            </div>
-
-            <div class="filters-section">
-                <div class="category-filter" id="categoryFilter">
-                    <button class="category-btn active" data-category="all">All Scripts</button>
-                    <button class="category-btn" data-category="universal">Universal</button>
-                    <button class="category-btn" data-category="game">Game Specific</button>
-                    <button class="category-btn" data-category="popular">Popular</button>
-                    <button class="category-btn" data-category="bookmarked">Bookmarks</button>
-                </div>
-
-                <div class="sort-filter">
-                    <span>Sort by:</span>
-                    <select class="sort-select" id="sortSelect">
-                        <option value="views">Most Viewed</option>
-                        <option value="newest">Newest</option>
-                        <option value="name">Name</option>
-                    </select>
-                </div>
-            </div>
-
-            <section class="stats">
-                <div class="stat-card">
-                    <div class="stat-number" id="totalScripts">0</div>
-                    <div class="stat-label">Total Scripts</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="universalScripts">0</div>
-                    <div class="stat-label">Universal</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number" id="gameScripts">0</div>
-                    <div class="stat-label">Game Specific</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">100%</div>
-                    <div class="stat-label">Safe</div>
-                </div>
-            </section>
-
-            <section class="scripts-section">
-                <div class="section-header">
-                    <div>
-                        <h2 class="section-title">Available Scripts</h2>
-                        <p class="section-subtitle">Click view to see code or copy to clipboard</p>
-                    </div>
-                    <div class="section-info" id="pageInfo">Page 1 of 1</div>
-                </div>
-
-                <div class="scripts-grid" id="scriptsGrid">
-                    <!-- Scripts will be loaded here -->
-                </div>
-
-                <div class="no-results" id="noResults">
-                    <i class="fas fa-search no-results-icon"></i>
-                    <h3>No Scripts Found</h3>
-                    <p>Try adjusting your search terms or category filter</p>
-                </div>
-
-                <div class="pagination" id="pagination">
-                    <!-- Pagination buttons will be generated here -->
-                </div>
-            </section>
         </div>
     </main>
 
-    <!-- Code Modal -->
-    <div class="modal" id="codeModal">
-        <div class="modal-content">
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal">
             <div class="modal-header">
-                <h3 class="modal-title" id="modalTitle">Script Code</h3>
-                <button class="modal-close" id="modalClose">
+                <h3 id="modalTitle">Script Source</h3>
+                <button class="btn" id="closeModal" style="border:none; background:none;">
                     <i class="fas fa-times"></i>
                 </button>
             </div>
             <div class="modal-body">
-                <pre class="code-block" id="modalCode"></pre>
+                <pre><code class="language-lua" id="modalCode"></code></pre>
             </div>
             <div class="modal-footer">
-                <button class="btn btn-secondary" id="copyCodeBtn">
-                    <i class="fas fa-copy"></i>
-                    Copy Code
-                </button>
-                <button class="btn btn-primary" id="closeModalBtn">
-                    Close
+                <button class="btn btn-primary" id="copyBtn">
+                    <i class="far fa-copy"></i> Копировать код
                 </button>
             </div>
         </div>
     </div>
 
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-links">
-                    <a href="#" class="footer-link">Home</a>
-                    <a href="#" class="footer-link">Scripts</a>
-                    <a href="#" class="footer-link" id="bookmarksLink">Bookmarks</a>
-                </div>
-                <p>&copy; 2025 RAVION SCRIPTS. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
 
     <script>
-        // Configuration
-        const SCRIPTS_PER_PAGE = 4;
-        let currentPage = 1;
-        let currentCategory = 'all';
-        let currentSort = 'views';
-        let currentTag = '';
-        let currentScripts = [];
-        let filteredScripts = [];
-        let searchTimeout = null;
+        let allScripts = [];
 
-        // Client-side database management
-        class ClientDatabase {
-            constructor() {
-                this.localKey = 'ravion_database';
-                this.loadFromLocal();
-            }
+        // 1. Загрузка данных из внешнего файла
+        async function fetchScripts() {
+            const grid = document.getElementById('grid');
+            const errorBox = document.getElementById('error-box');
 
-            loadFromLocal() {
-                const localData = localStorage.getItem(this.localKey);
-                if (localData) {
-                    try {
-                        this.data = JSON.parse(localData);
-                    } catch (e) {
-                        this.data = this.getDefaultStructure();
-                    }
-                } else {
-                    this.data = this.getDefaultStructure();
-                }
-                return this.data;
-            }
-
-            getDefaultStructure() {
-                return {
-                    views: {},
-                    bookmarks: {},
-                    statistics: {
-                        totalViews: 0,
-                        lastUpdated: new Date().toISOString()
-                    }
-                };
-            }
-
-            saveToLocal() {
-                this.data.statistics.lastUpdated = new Date().toISOString();
-                localStorage.setItem(this.localKey, JSON.stringify(this.data));
-                return this.data;
-            }
-
-            incrementViews(scriptId) {
-                if (!this.data.views[scriptId]) {
-                    this.data.views[scriptId] = 0;
-                }
-                this.data.views[scriptId]++;
-                this.data.statistics.totalViews++;
-                
-                this.saveToLocal();
-                return this.data.views[scriptId];
-            }
-
-            getViews(scriptId) {
-                return this.data.views[scriptId] || 0;
-            }
-
-            toggleBookmark(userId, scriptId) {
-                if (!this.data.bookmarks[userId]) {
-                    this.data.bookmarks[userId] = [];
-                }
-                
-                const bookmarks = this.data.bookmarks[userId];
-                const index = bookmarks.indexOf(scriptId);
-                
-                if (index > -1) {
-                    bookmarks.splice(index, 1);
-                } else {
-                    bookmarks.push(scriptId);
-                }
-                
-                this.saveToLocal();
-                return bookmarks;
-            }
-
-            isBookmarked(userId, scriptId) {
-                return this.data.bookmarks[userId]?.includes(scriptId) || false;
-            }
-
-            getGlobalStats() {
-                const popularScripts = Object.entries(this.data.views)
-                    .map(([scriptId, views]) => ({ scriptId: parseInt(scriptId), views }))
-                    .sort((a, b) => b.views - a.views)
-                    .slice(0, 5);
-
-                return {
-                    totalViews: this.data.statistics.totalViews,
-                    totalScripts: Object.keys(this.data.views).length,
-                    popularScripts: popularScripts,
-                    lastUpdated: this.data.statistics.lastUpdated
-                };
-            }
-        }
-
-        // Initialize database
-        const clientDB = new ClientDatabase();
-
-        // Utility functions
-        function showNotification(message) {
-            const notification = document.getElementById('notification');
-            const notificationText = document.getElementById('notificationText');
-            
-            notificationText.textContent = message;
-            notification.classList.add('show');
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        function getViews(scriptId) {
-            return clientDB.getViews(scriptId);
-        }
-
-        function isBookmarked(scriptId) {
-            const userId = 'default_user';
-            return clientDB.isBookmarked(userId, scriptId);
-        }
-
-        function isPopular(script) {
-            const views = getViews(script.id);
-            return views > 50;
-        }
-
-        async function incrementViews(scriptId) {
-            const views = clientDB.incrementViews(scriptId);
-            updateQuickStats();
-            return views;
-        }
-
-        function toggleBookmark(scriptId) {
-            const userId = 'default_user';
-            clientDB.toggleBookmark(userId, scriptId);
-            
-            if (currentCategory === 'bookmarked') {
-                filterScripts('bookmarked');
-            } else {
-                displayScripts(filteredScripts.slice((currentPage - 1) * SCRIPTS_PER_PAGE, currentPage * SCRIPTS_PER_PAGE));
-            }
-        }
-
-        // Advanced search configuration
-        const SEARCH_WEIGHTS = {
-            name: 10,
-            game: 8,
-            description: 6,
-            type: 5,
-            tags: 7
-        };
-
-        const STOP_WORDS = new Set(['the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'of', 'with', 'by']);
-
-        // Smart search algorithms
-        class SmartSearch {
-            static tokenize(text) {
-                return text.toLowerCase().split(/[^\w]+/).filter(token => 
-                    token.length > 2 && !STOP_WORDS.has(token)
-                );
-            }
-
-            static stem(word) {
-                if (word.length <= 3) return word;
-                
-                const endings = [
-                    'ing', 'ed', 's', 'es', 'ly', 'ment', 'ness', 'tion', 'sion'
-                ];
-                
-                for (const ending of endings) {
-                    if (word.endsWith(ending)) {
-                        return word.slice(0, -ending.length);
-                    }
-                }
-                
-                return word;
-            }
-
-            static calculateRelevance(script, searchTokens) {
-                let score = 0;
-                const fields = [
-                    { name: 'name', weight: SEARCH_WEIGHTS.name },
-                    { name: 'game', weight: SEARCH_WEIGHTS.game },
-                    { name: 'description', weight: SEARCH_WEIGHTS.description },
-                    { name: 'type', weight: SEARCH_WEIGHTS.type }
-                ];
-
-                // Search in tags
-                if (script.tags) {
-                    script.tags.forEach(tag => {
-                        searchTokens.forEach(searchToken => {
-                            if (tag.toLowerCase().includes(searchToken)) {
-                                score += SEARCH_WEIGHTS.tags;
-                            }
-                        });
-                    });
-                }
-
-                for (const field of fields) {
-                    const value = script[field.name] || '';
-                    const tokens = this.tokenize(value);
-                    const stemmedTokens = tokens.map(this.stem);
-
-                    for (const searchToken of searchTokens) {
-                        const stemmedSearchToken = this.stem(searchToken);
-                        
-                        if (stemmedTokens.includes(stemmedSearchToken)) {
-                            score += field.weight * 2;
-                        }
-                        
-                        for (const token of stemmedTokens) {
-                            if (token.includes(stemmedSearchToken) || stemmedSearchToken.includes(token)) {
-                                score += field.weight;
-                            }
-                        }
-                        
-                        for (const token of stemmedTokens) {
-                            const similarity = this.calculateSimilarity(token, stemmedSearchToken);
-                            if (similarity > 0.7) {
-                                score += field.weight * similarity;
-                            }
-                        }
-                    }
-                }
-
-                if (script.name.toLowerCase().includes(searchTokens.join(' '))) {
-                    score += 20;
-                }
-
-                if (searchTokens.includes('universal') && script.type === 'universal') {
-                    score += 15;
-                }
-
-                return Math.min(100, Math.round(score));
-            }
-
-            static calculateSimilarity(a, b) {
-                const longer = a.length > b.length ? a : b;
-                const shorter = a.length > b.length ? b : a;
-                
-                if (longer.length === 0) return 1.0;
-                
-                return (longer.length - this.editDistance(longer, shorter)) / parseFloat(longer.length);
-            }
-
-            static editDistance(a, b) {
-                const matrix = [];
-                let i, j;
-
-                if (a.length === 0) return b.length;
-                if (b.length === 0) return a.length;
-
-                for (i = 0; i <= b.length; i++) {
-                    matrix[i] = [i];
-                }
-
-                for (j = 0; j <= a.length; j++) {
-                    matrix[0][j] = j;
-                }
-
-                for (i = 1; i <= b.length; i++) {
-                    for (j = 1; j <= a.length; j++) {
-                        if (b.charAt(i-1) === a.charAt(j-1)) {
-                            matrix[i][j] = matrix[i-1][j-1];
-                        } else {
-                            matrix[i][j] = Math.min(
-                                matrix[i-1][j-1] + 1,
-                                matrix[i][j-1] + 1,
-                                matrix[i-1][j] + 1
-                            );
-                        }
-                    }
-                }
-
-                return matrix[b.length][a.length];
-            }
-
-            static highlightText(text, searchTokens) {
-                let highlighted = text;
-                searchTokens.forEach(token => {
-                    const regex = new RegExp(`(${token})`, 'gi');
-                    highlighted = highlighted.replace(regex, '<span class="suggestion-highlight">$1</span>');
-                });
-                return highlighted;
-            }
-        }
-
-        // Load scripts from JSON file
-        let scriptsData = [];
-
-        async function loadScripts() {
             try {
-                const response = await fetch('scripts.json?t=' + Date.now());
-                if (response.ok) {
-                    scriptsData = await response.json();
-                    currentScripts = [...scriptsData];
-                    filteredScripts = [...scriptsData];
-                    updateStats();
-                    displayPage(1);
-                    generateSearchSuggestions();
-                    updateTagsCloud();
-                    updateQuickStats();
+                const response = await fetch('scripts.json');
+                
+                if (!response.ok) {
+                    throw new Error(`Ошибка загрузки: ${response.status}`);
                 }
+
+                allScripts = await response.json();
+                renderScripts(allScripts);
+
             } catch (error) {
-                console.error('Error loading scripts:', error);
-                scriptsData = [];
-                currentScripts = [];
-                filteredScripts = [];
+                grid.style.display = 'none';
+                errorBox.style.display = 'block';
+                errorBox.innerHTML = `
+                    <h3>Не удалось загрузить скрипты</h3>
+                    <p>${error.message}</p>
+                    <br>
+                    <small>Если вы открыли файл просто в браузере (file://), то это не сработает из-за защиты браузера.</small>
+                    <small>Используйте локальный сервер (Live Server) или загрузите сайт на GitHub Pages/хостинг.</small>
+                `;
             }
         }
 
-        // Update quick stats in hero section
-        function updateQuickStats() {
-            const stats = clientDB.getGlobalStats();
-            const popularScriptsCount = scriptsData.filter(script => isPopular(script)).length;
-            
-            document.getElementById('totalScriptsQuick').textContent = scriptsData.length;
-            document.getElementById('totalViews').textContent = stats.totalViews.toLocaleString();
-            document.getElementById('popularScripts').textContent = popularScriptsCount;
-        }
-
-        // Generate search suggestions from script data
-        function generateSearchSuggestions() {
-            const suggestions = new Set();
-            
-            scriptsData.forEach(script => {
-                suggestions.add(script.name.toLowerCase());
-                if (script.game) suggestions.add(script.game.toLowerCase());
-                if (script.type) suggestions.add(script.type.toLowerCase());
-                
-                if (script.tags) {
-                    script.tags.forEach(tag => suggestions.add(tag.toLowerCase()));
-                }
-                
-                const descWords = script.description.toLowerCase().split(' ');
-                descWords.forEach(word => {
-                    if (word.length > 3 && !STOP_WORDS.has(word)) {
-                        suggestions.add(word);
-                    }
-                });
-            });
-
-            return Array.from(suggestions).sort();
-        }
-
-        // Update tags cloud
-        function updateTagsCloud() {
-            const tagsCloud = document.getElementById('tagsCloud');
-            const allTags = new Set();
-            
-            scriptsData.forEach(script => {
-                if (script.tags) {
-                    script.tags.forEach(tag => allTags.add(tag.toLowerCase()));
-                }
-            });
-            
-            const tagsArray = Array.from(allTags).sort();
-            tagsCloud.innerHTML = tagsArray.map(tag => 
-                `<div class="tag" data-tag="${tag}">${tag}</div>`
-            ).join('');
-        }
-
-        // Update statistics
-        function updateStats() {
-            document.getElementById('totalScripts').textContent = scriptsData.length;
-            
-            const universalScripts = scriptsData.filter(script => script.type === 'universal').length;
-            const gameScripts = scriptsData.filter(script => script.type !== 'universal').length;
-            
-            document.getElementById('universalScripts').textContent = universalScripts;
-            document.getElementById('gameScripts').textContent = gameScripts;
-        }
-
-        // Smart search function
-        function performSmartSearch(searchTerm) {
-            if (!searchTerm.trim()) {
-                return scriptsData.map(script => ({ script, relevance: 0 }));
-            }
-
-            const searchTokens = SmartSearch.tokenize(searchTerm);
-            const results = [];
-
-            scriptsData.forEach(script => {
-                const relevance = SmartSearch.calculateRelevance(script, searchTokens);
-                if (relevance > 0) {
-                    results.push({ script, relevance });
-                }
-            });
-
-            results.sort((a, b) => b.relevance - a.relevance);
-            
-            return results;
-        }
-
-        // Sort scripts
-        function sortScripts(scripts, sortBy) {
-            const sorted = [...scripts];
-            
-            switch (sortBy) {
-                case 'views':
-                    return sorted.sort((a, b) => getViews(b.id) - getViews(a.id));
-                case 'newest':
-                    return sorted.sort((a, b) => (b.id || 0) - (a.id || 0));
-                case 'name':
-                    return sorted.sort((a, b) => a.name.localeCompare(b.name));
-                default:
-                    return sorted;
-            }
-        }
-
-        // Show search suggestions
-        function showSearchSuggestions(searchTerm) {
-            const suggestionsContainer = document.getElementById('searchSuggestions');
-            const suggestions = generateSearchSuggestions();
-            
-            if (!searchTerm.trim()) {
-                suggestionsContainer.classList.remove('active');
-                return;
-            }
-
-            const filteredSuggestions = suggestions.filter(suggestion =>
-                suggestion.includes(searchTerm.toLowerCase())
-            ).slice(0, 5);
-
-            if (filteredSuggestions.length === 0) {
-                suggestionsContainer.classList.remove('active');
-                return;
-            }
-
-            suggestionsContainer.innerHTML = filteredSuggestions.map(suggestion => 
-                `<div class="suggestion-item" onclick="selectSuggestion('${suggestion}')">${
-                    SmartSearch.highlightText(suggestion, [searchTerm])
-                }</div>`
-            ).join('');
-
-            suggestionsContainer.classList.add('active');
-        }
-
-        // Select suggestion from dropdown
-        function selectSuggestion(suggestion) {
-            document.getElementById('searchInput').value = suggestion;
-            document.getElementById('searchSuggestions').classList.remove('active');
-            performSearch();
-        }
-
-        // Perform search with debouncing
-        function performSearch() {
-            const searchTerm = document.getElementById('searchInput').value.trim();
-            const resultsInfo = document.getElementById('searchResultsInfo');
-            const relevanceInfo = document.getElementById('relevanceInfo');
-            const resultsCount = document.getElementById('resultsCount');
-
-            clearTimeout(searchTimeout);
-            
-            searchTimeout = setTimeout(() => {
-                if (searchTerm === '') {
-                    currentScripts = [...scriptsData];
-                    resultsInfo.style.display = 'none';
-                } else {
-                    const searchResults = performSmartSearch(searchTerm);
-                    currentScripts = searchResults.map(result => result.script);
-                    
-                    resultsCount.textContent = searchResults.length;
-                    const highRelevanceCount = searchResults.filter(r => r.relevance > 50).length;
-                    
-                    if (highRelevanceCount > 0) {
-                        relevanceInfo.innerHTML = `<span class="relevance-badge">${highRelevanceCount} highly relevant</span>`;
-                    } else {
-                        relevanceInfo.innerHTML = '';
-                    }
-                    
-                    resultsInfo.style.display = 'block';
-                }
-                
-                filterScripts(currentCategory);
-                document.getElementById('searchSuggestions').classList.remove('active');
-            }, 300);
-        }
-
-        // Filter scripts by category
-        function filterScripts(category) {
-            currentCategory = category;
-            
-            if (category === 'all') {
-                filteredScripts = [...currentScripts];
-            } else if (category === 'universal') {
-                filteredScripts = currentScripts.filter(script => script.type === 'universal');
-            } else if (category === 'game') {
-                filteredScripts = currentScripts.filter(script => script.type !== 'universal');
-            } else if (category === 'popular') {
-                filteredScripts = currentScripts.filter(script => isPopular(script));
-            } else if (category === 'bookmarked') {
-                filteredScripts = currentScripts.filter(script => isBookmarked(script.id));
-            }
-            
-            // Apply tag filter if active
-            if (currentTag) {
-                filteredScripts = filteredScripts.filter(script => 
-                    script.tags && script.tags.some(tag => tag.toLowerCase() === currentTag)
-                );
-            }
-            
-            // Apply sorting
-            filteredScripts = sortScripts(filteredScripts, currentSort);
-            
-            displayPage(1);
-        }
-
-        // Display scripts for specific page
-        function displayPage(page) {
-            currentPage = page;
-            const startIndex = (page - 1) * SCRIPTS_PER_PAGE;
-            const endIndex = startIndex + SCRIPTS_PER_PAGE;
-            const pageScripts = filteredScripts.slice(startIndex, endIndex);
-
-            displayScripts(pageScripts);
-            updatePagination();
-        }
-
-        // Display scripts in grid
-        function displayScripts(scripts) {
-            const grid = document.getElementById('scriptsGrid');
-            const noResults = document.getElementById('noResults');
-
+        // 2. Отрисовка карточек
+        function renderScripts(scripts) {
+            const grid = document.getElementById('grid');
             grid.innerHTML = '';
 
             if (scripts.length === 0) {
-                noResults.classList.add('active');
+                grid.innerHTML = '<div style="color: var(--text-muted)">Ничего не найдено</div>';
                 return;
             }
 
-            noResults.classList.remove('active');
-
             scripts.forEach(script => {
-                const isUniversal = script.type === 'universal';
-                const isPopularScript = isPopular(script);
-                const isBookmarkedScript = isBookmarked(script.id);
-                const views = getViews(script.id);
-                const searchTerm = document.getElementById('searchInput').value.trim();
-                const searchTokens = searchTerm ? SmartSearch.tokenize(searchTerm) : [];
-                
                 const card = document.createElement('div');
-                card.className = `script-card ${isUniversal ? 'universal' : ''} ${isPopularScript ? 'popular' : ''}`;
+                card.className = 'card';
                 card.innerHTML = `
-                    <div class="script-header">
-                        <div>
-                            <h3 class="script-title">${
-                                searchTerm ? SmartSearch.highlightText(script.name, searchTokens) : script.name
-                            }</h3>
-                            <div class="script-game">${
-                                isUniversal ? 'Universal Script' : 
-                                (searchTerm ? SmartSearch.highlightText(script.game, searchTokens) : script.game)
-                            }</div>
-                        </div>
-                        <span class="script-badge">#${script.id}</span>
+                    <div class="card-top">
+                        <span class="game-label">${script.game}</span>
                     </div>
-                    <div class="script-meta">
-                        <div class="script-stats">
-                            <div class="stat views">
-                                <i class="fas fa-eye"></i>
-                                <span>${views.toLocaleString()} views</span>
-                            </div>
-                        </div>
-                        <button class="bookmark-btn ${isBookmarkedScript ? 'bookmarked' : ''}" onclick="toggleBookmark(${script.id})">
-                            <i class="fas fa-bookmark"></i>
-                        </button>
-                    </div>
-                    <p class="script-description">${
-                        searchTerm ? SmartSearch.highlightText(script.description, searchTokens) : script.description
-                    }</p>
-                    ${script.tags ? `
-                    <div class="script-tags">
-                        ${script.tags.map(tag => 
-                            `<div class="script-tag" onclick="filterByTag('${tag.toLowerCase()}')">${tag}</div>`
-                        ).join('')}
-                    </div>
-                    ` : ''}
-                    <div class="script-actions">
-                        <button class="btn btn-primary" onclick="viewScript(${script.id})">
-                            <i class="fas fa-eye"></i>
-                            View Code
-                        </button>
-                        <button class="btn btn-secondary" onclick="copyScript(${script.id})">
-                            <i class="fas fa-copy"></i>
-                            Copy
-                        </button>
-                    </div>
+                    <h3>${script.title}</h3>
+                    <p>${script.desc}</p>
+                    <button class="btn" onclick="openScript(${script.id})">
+                        <i class="fas fa-code"></i> Показать код
+                    </button>
                 `;
                 grid.appendChild(card);
             });
         }
 
-        // Filter by tag
-        function filterByTag(tag) {
-            currentTag = currentTag === tag ? '' : tag;
+        // 3. Поиск
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const val = e.target.value.toLowerCase();
+            const filtered = allScripts.filter(s => 
+                s.title.toLowerCase().includes(val) || 
+                s.game.toLowerCase().includes(val)
+            );
+            renderScripts(filtered);
+        });
+
+        // 4. Модальное окно
+        const modal = document.getElementById('modalOverlay');
+        const modalCode = document.getElementById('modalCode');
+        const modalTitle = document.getElementById('modalTitle');
+
+        window.openScript = (id) => {
+            const script = allScripts.find(s => s.id === id);
+            if (!script) return;
+
+            modalTitle.textContent = script.title;
+            modalCode.textContent = script.code;
             
-            // Update tag buttons
-            document.querySelectorAll('.tag').forEach(btn => {
-                btn.classList.toggle('active', btn.getAttribute('data-tag') === tag && currentTag === tag);
+            modal.classList.add('active');
+            Prism.highlightElement(modalCode); // Подсветка кода
+        };
+
+        // Закрытие модалки
+        document.getElementById('closeModal').addEventListener('click', () => modal.classList.remove('active'));
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) modal.classList.remove('active');
+        });
+
+        // Копирование
+        document.getElementById('copyBtn').addEventListener('click', function() {
+            navigator.clipboard.writeText(modalCode.textContent).then(() => {
+                const originalText = this.innerHTML;
+                this.innerHTML = '<i class="fas fa-check"></i> Скопировано';
+                setTimeout(() => {
+                    this.innerHTML = originalText;
+                }, 2000);
             });
-            
-            filterScripts(currentCategory);
-        }
-
-        // Update pagination controls
-        function updatePagination() {
-            const totalPages = Math.ceil(filteredScripts.length / SCRIPTS_PER_PAGE);
-            const pagination = document.getElementById('pagination');
-            const pageInfo = document.getElementById('pageInfo');
-
-            pageInfo.textContent = `Page ${currentPage} of ${totalPages}`;
-
-            if (totalPages <= 1) {
-                pagination.innerHTML = '';
-                return;
-            }
-
-            let paginationHTML = '';
-
-            if (currentPage > 1) {
-                paginationHTML += `<button class="page-btn" onclick="displayPage(${currentPage - 1})">
-                    <i class="fas fa-chevron-left"></i>
-                </button>`;
-            } else {
-                paginationHTML += `<button class="page-btn disabled">
-                    <i class="fas fa-chevron-left"></i>
-                </button>`;
-            }
-
-            for (let i = 1; i <= totalPages; i++) {
-                if (i === currentPage) {
-                    paginationHTML += `<button class="page-btn active">${i}</button>`;
-                } else {
-                    paginationHTML += `<button class="page-btn" onclick="displayPage(${i})">${i}</button>`;
-                }
-            }
-
-            if (currentPage < totalPages) {
-                paginationHTML += `<button class="page-btn" onclick="displayPage(${currentPage + 1})">
-                    <i class="fas fa-chevron-right"></i>
-                </button>`;
-            } else {
-                paginationHTML += `<button class="page-btn disabled">
-                    <i class="fas fa-chevron-right"></i>
-                </button>`;
-            }
-
-            pagination.innerHTML = paginationHTML;
-        }
-
-        // View script code
-        async function viewScript(scriptId) {
-            const script = scriptsData.find(s => s.id === scriptId);
-            if (script) {
-                // Increment view count
-                await incrementViews(scriptId);
-                
-                const isUniversal = script.type === 'universal';
-                document.getElementById('modalTitle').textContent = `${script.name} - ${isUniversal ? 'Universal Script' : script.game}`;
-                document.getElementById('modalCode').textContent = script.code;
-                document.getElementById('codeModal').classList.add('active');
-                
-                document.getElementById('copyCodeBtn').setAttribute('data-script-id', scriptId);
-                
-                // Refresh the displayed script to show updated view count
-                if (currentCategory === 'popular' || currentSort === 'views') {
-                    filterScripts(currentCategory);
-                }
-            }
-        }
-
-        // Copy script to clipboard
-        function copyScript(scriptId) {
-            const script = scriptsData.find(s => s.id === scriptId);
-            if (script) {
-                navigator.clipboard.writeText(script.code).then(() => {
-                    showNotification('Script copied to clipboard!');
-                    const btn = event.target;
-                    const originalHTML = btn.innerHTML;
-                    btn.innerHTML = '<i class="fas fa-check"></i>Copied!';
-                    btn.className = 'btn btn-success';
-                    
-                    setTimeout(() => {
-                        btn.innerHTML = originalHTML;
-                        btn.className = 'btn btn-secondary';
-                    }, 2000);
-                });
-            }
-        }
-
-        // Modal functionality
-        document.getElementById('modalClose').addEventListener('click', closeModal);
-        document.getElementById('closeModalBtn').addEventListener('click', closeModal);
-        document.getElementById('copyCodeBtn').addEventListener('click', function() {
-            const scriptId = this.getAttribute('data-script-id');
-            if (scriptId) {
-                copyScript(parseInt(scriptId));
-            }
         });
 
-        function closeModal() {
-            document.getElementById('codeModal').classList.remove('active');
-        }
-
-        // Close modal on escape key
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') {
-                closeModal();
-            }
-        });
-
-        // Theme toggle
-        document.getElementById('themeToggle').addEventListener('click', function() {
-            const isDark = document.body.style.getProperty('--bg-primary') !== '#ffffff';
-            
-            if (isDark) {
-                // Switch to light theme
-                document.body.style.setProperty('--bg-primary', '#ffffff');
-                document.body.style.setProperty('--bg-secondary', '#f8f9fa');
-                document.body.style.setProperty('--bg-tertiary', '#e9ecef');
-                document.body.style.setProperty('--text-primary', '#212529');
-                document.body.style.setProperty('--text-secondary', '#6c757d');
-                document.body.style.setProperty('--text-tertiary', '#adb5bd');
-                document.body.style.setProperty('--border', '#dee2e6');
-                document.body.style.setProperty('--accent', '#212529');
-                document.body.style.setProperty('--success', '#198754');
-                document.body.style.setProperty('--universal', '#fd7e14');
-                document.body.style.setProperty('--views', '#0d6efd');
-                document.body.style.setProperty('--bookmark', '#dc3545');
-                this.innerHTML = '<i class="fas fa-sun"></i>';
-            } else {
-                // Switch to dark theme
-                document.body.style.setProperty('--bg-primary', '#0a0a0a');
-                document.body.style.setProperty('--bg-secondary', '#111111');
-                document.body.style.setProperty('--bg-tertiary', '#1a1a1a');
-                document.body.style.setProperty('--text-primary', '#ffffff');
-                document.body.style.setProperty('--text-secondary', '#888888');
-                document.body.style.setProperty('--text-tertiary', '#555555');
-                document.body.style.setProperty('--border', '#222222');
-                document.body.style.setProperty('--accent', '#ffffff');
-                document.body.style.setProperty('--success', '#00ff00');
-                document.body.style.setProperty('--universal', '#ff6b00');
-                document.body.style.setProperty('--views', '#4dabf7');
-                document.body.style.setProperty('--bookmark', '#ff4757');
-                this.innerHTML = '<i class="fas fa-moon"></i>';
-            }
-        });
-
-        // Search functionality with debouncing and suggestions
-        document.getElementById('searchInput').addEventListener('input', function(e) {
-            const searchTerm = e.target.value;
-            showSearchSuggestions(searchTerm);
-            performSearch();
-        });
-
-        // Hide suggestions when clicking outside
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.search-input-wrapper')) {
-                document.getElementById('searchSuggestions').classList.remove('active');
-            }
-        });
-
-        // Category filter functionality
-        document.getElementById('categoryFilter').addEventListener('click', function(e) {
-            if (e.target.classList.contains('category-btn')) {
-                document.querySelectorAll('.category-btn').forEach(btn => {
-                    btn.classList.remove('active');
-                });
-                
-                e.target.classList.add('active');
-                
-                const category = e.target.getAttribute('data-category');
-                filterScripts(category);
-            }
-        });
-
-        // Sort functionality
-        document.getElementById('sortSelect').addEventListener('change', function(e) {
-            currentSort = e.target.value;
-            filterScripts(currentCategory);
-        });
-
-        // Tag cloud functionality
-        document.getElementById('tagsCloud').addEventListener('click', function(e) {
-            if (e.target.classList.contains('tag')) {
-                const tag = e.target.getAttribute('data-tag');
-                filterByTag(tag);
-            }
-        });
-
-        // Bookmarks link
-        document.getElementById('bookmarksLink').addEventListener('click', function(e) {
-            e.preventDefault();
-            document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
-            document.querySelector('[data-category="bookmarked"]').classList.add('active');
-            filterScripts('bookmarked');
-        });
-
-        // Initialize
-        loadScripts();
+        // Запуск при загрузке
+        fetchScripts();
     </script>
 </body>
 </html>
