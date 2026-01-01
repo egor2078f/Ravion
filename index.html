@@ -1,389 +1,252 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAVION Scripts</title>
+    <title>ScriptHub | Roblox Scripts</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-vsc-dark-plus.min.css" rel="stylesheet" />
-
     <style>
         :root {
-            --bg-body: #0d1117; /* Цвет фона GitHub Dark */
-            --bg-card: #161b22;
-            --border: #30363d;
-            --text-main: #c9d1d9;
-            --text-muted: #8b949e;
-            --accent: #58a6ff; /* Синий акцент */
-            --accent-hover: #79c0ff;
-            --radius: 6px;
+            --bg: #111216; /* ScriptBlox dark style */
+            --card: #1f2128;
+            --accent: #7289da;
+            --text: #ffffff;
+            --text-gray: #a0a0a0;
         }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; }
+        
+        body { background-color: var(--bg); color: var(--text); min-height: 100vh; display: flex; flex-direction: column; }
 
-        body {
-            background-color: var(--bg-body);
-            color: var(--text-main);
-            font-family: 'Inter', sans-serif;
-            font-size: 14px;
-            line-height: 1.5;
+        /* Navbar */
+        nav {
+            background: var(--card); padding: 15px 5%; display: flex; 
+            justify-content: space-between; align-items: center; border-bottom: 1px solid #2a2c35;
+        }
+        .logo { font-size: 1.5rem; font-weight: 700; color: var(--accent); text-transform: uppercase; }
+        .nav-links a { color: var(--text-gray); text-decoration: none; margin-left: 20px; transition: 0.3s; }
+        .nav-links a:hover { color: var(--text); }
+
+        /* Search Section */
+        .search-area {
+            padding: 40px 20px; text-align: center; background: radial-gradient(circle at top, #1e212b 0%, var(--bg) 70%);
+        }
+        .search-box {
+            position: relative; max-width: 600px; margin: 0 auto;
+        }
+        .search-box input {
+            width: 100%; padding: 15px 50px 15px 20px; border-radius: 8px; border: none;
+            background: #252830; color: #fff; font-size: 1rem; outline: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+        .search-box i {
+            position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: var(--text-gray);
         }
 
-        /* Header */
-        header {
-            background: var(--bg-card);
-            border-bottom: 1px solid var(--border);
-            padding: 1rem 0;
-            position: sticky;
-            top: 0;
-            z-index: 100;
+        /* Filter Tabs */
+        .filters { display: flex; justify-content: center; gap: 10px; margin-top: 20px; flex-wrap: wrap; }
+        .filter-btn {
+            background: transparent; border: 1px solid #333; color: var(--text-gray);
+            padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: 0.3s;
         }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-
-        .nav-flex {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .logo {
-            font-size: 1.2rem;
-            font-weight: 600;
-            color: var(--text-main);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        /* Search Area */
-        .controls {
-            margin: 2rem 0;
-            display: flex;
-            gap: 1rem;
-            flex-wrap: wrap;
-        }
-
-        .search-input {
-            flex: 1;
-            background: var(--bg-body);
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            padding: 8px 12px;
-            border-radius: var(--radius);
-            font-family: inherit;
-            min-width: 250px;
-        }
-
-        .search-input:focus {
-            outline: none;
-            border-color: var(--accent);
-            box-shadow: 0 0 0 3px rgba(88, 166, 255, 0.1);
-        }
+        .filter-btn:hover, .filter-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
 
         /* Grid */
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; flex: 1; }
         .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-            margin-bottom: 3rem;
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 20px;
         }
 
+        /* Card Design (Like ScriptBlox) */
         .card {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            padding: 1.5rem;
-            display: flex;
-            flex-direction: column;
-            transition: border-color 0.2s;
+            background: var(--card); border-radius: 10px; overflow: hidden;
+            transition: transform 0.2s, box-shadow 0.2s; border: 1px solid #2a2c35;
+            display: flex; flex-direction: column;
         }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0,0,0,0.3); border-color: var(--accent); }
 
-        .card:hover {
-            border-color: var(--text-muted);
+        .card-img {
+            height: 140px; background: #2a2c35; background-size: cover; background-position: center;
+            display: flex; align-items: center; justify-content: center; color: #444;
         }
-
-        .card-top {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            margin-bottom: 0.5rem;
+        
+        .card-body { padding: 15px; flex: 1; display: flex; flex-direction: column; }
+        .game-tag { font-size: 0.75rem; color: var(--accent); font-weight: 600; text-transform: uppercase; margin-bottom: 5px; }
+        .card-title { font-size: 1.1rem; font-weight: 600; margin-bottom: 10px; line-height: 1.4; }
+        
+        .card-meta {
+            margin-top: auto; display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid #2a2c35;
         }
-
-        .game-label {
-            font-size: 12px;
-            color: var(--text-muted);
-            border: 1px solid var(--border);
-            padding: 2px 8px;
-            border-radius: 20px;
+        .meta-info { font-size: 0.8rem; color: var(--text-gray); }
+        
+        .btn-copy {
+            background: #2c2f3a; color: white; border: none; padding: 8px 15px;
+            border-radius: 5px; cursor: pointer; font-size: 0.85rem; font-weight: 500; transition: 0.2s;
         }
+        .btn-copy:hover { background: var(--accent); }
 
-        .card h3 {
-            font-size: 16px;
-            font-weight: 600;
-            color: #58a6ff;
-            margin-bottom: 0.5rem;
+        /* Not Found State */
+        .not-found {
+            grid-column: 1 / -1; text-align: center; padding: 60px 0; color: var(--text-gray);
         }
+        .not-found i { font-size: 3rem; margin-bottom: 15px; opacity: 0.5; }
+        .not-found h2 { font-size: 1.5rem; color: white; }
 
-        .card p {
-            color: var(--text-muted);
-            font-size: 13px;
-            margin-bottom: 1.5rem;
-            flex-grow: 1;
+        /* Toast Notification */
+        .toast {
+            position: fixed; bottom: 30px; right: 30px; background: var(--accent); color: white;
+            padding: 12px 24px; border-radius: 8px; box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            transform: translateY(100px); opacity: 0; transition: 0.3s; z-index: 1000;
         }
+        .toast.show { transform: translateY(0); opacity: 1; }
 
-        .btn {
-            background: #21262d;
-            border: 1px solid var(--border);
-            color: var(--text-main);
-            padding: 6px 12px;
-            border-radius: var(--radius);
-            cursor: pointer;
-            font-size: 13px;
-            font-weight: 500;
-            transition: 0.2s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            justify-content: center;
-        }
-
-        .btn:hover {
-            background: #30363d;
-            border-color: #8b949e;
-        }
-
-        .btn-primary {
-            background: #238636;
-            border-color: rgba(240,246,252,0.1);
-            color: white;
-            width: 100%;
-        }
-
-        .btn-primary:hover {
-            background: #2ea043;
-        }
-
-        /* Modal */
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.7);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        .modal-overlay.active { display: flex; }
-
-        .modal {
-            background: var(--bg-card);
-            border: 1px solid var(--border);
-            border-radius: var(--radius);
-            width: 90%;
-            max-width: 800px;
-            max-height: 80vh;
-            display: flex;
-            flex-direction: column;
-        }
-
-        .modal-header {
-            padding: 1rem;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-
-        .modal-body {
-            overflow: auto;
-            background: #0d1117;
-            position: relative;
-        }
-
-        pre { margin: 0 !important; border-radius: 0 !important; }
-
-        .modal-footer {
-            padding: 1rem;
-            border-top: 1px solid var(--border);
-            display: flex;
-            justify-content: flex-end;
-            gap: 10px;
-        }
-
-        /* Error state */
-        .error-msg {
-            color: #f85149;
-            text-align: center;
-            padding: 2rem;
-            border: 1px solid rgba(248, 81, 73, 0.4);
-            border-radius: var(--radius);
-            background: rgba(248, 81, 73, 0.1);
-            display: none;
+        @media (max-width: 768px) {
+            .grid { grid-template-columns: 1fr; }
+            .search-box { width: 100%; }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <div class="container nav-flex">
-            <a href="#" class="logo">
-                <i class="fas fa-code-branch"></i>
-                RAVION Repository
-            </a>
-            <div style="font-size: 12px; color: var(--text-muted);">
-                Scripts v1.0
-            </div>
+    <nav>
+        <div class="logo">ScriptHub</div>
+        <div class="nav-links">
+            <a href="#" onclick="filterScripts('all')">Home</a>
+            <a href="https://discord.com" target="_blank">Discord</a>
         </div>
-    </header>
+    </nav>
 
-    <main class="container">
-        <div class="controls">
-            <input type="text" class="search-input" id="searchInput" placeholder="Поиск скрипта по названию или игре...">
+    <div class="search-area">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search scripts...">
+            <i class="fas fa-search"></i>
         </div>
-
-        <div id="error-box" class="error-msg"></div>
-        <div class="grid" id="grid">
-            <div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 2rem;">
-                Загрузка данных...
-            </div>
-        </div>
-    </main>
-
-    <div class="modal-overlay" id="modalOverlay">
-        <div class="modal">
-            <div class="modal-header">
-                <h3 id="modalTitle">Script Source</h3>
-                <button class="btn" id="closeModal" style="border:none; background:none;">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <pre><code class="language-lua" id="modalCode"></code></pre>
-            </div>
-            <div class="modal-footer">
-                <button class="btn btn-primary" id="copyBtn">
-                    <i class="far fa-copy"></i> Копировать код
-                </button>
-            </div>
+        <div class="filters">
+            <button class="filter-btn active" onclick="filterType('all', this)">All</button>
+            <button class="filter-btn" onclick="filterType('universal', this)">Universal</button>
+            <button class="filter-btn" onclick="filterType('game', this)">Games</button>
         </div>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-lua.min.js"></script>
+    <div class="container">
+        <div class="grid" id="scriptGrid">
+            </div>
+    </div>
+
+    <div class="toast" id="toast">Copied to clipboard!</div>
 
     <script>
         let allScripts = [];
+        let currentFilter = 'all';
 
-        // 1. Загрузка данных из внешнего файла
-        async function fetchScripts() {
-            const grid = document.getElementById('grid');
-            const errorBox = document.getElementById('error-box');
+        // 1. Загрузка базы данных
+        async function loadScripts() {
+            const grid = document.getElementById('scriptGrid');
+            grid.innerHTML = '<div class="not-found"><i class="fas fa-spinner fa-spin"></i><p>Loading...</p></div>';
 
             try {
-                const response = await fetch('scripts.json');
-                
-                if (!response.ok) {
-                    throw new Error(`Ошибка загрузки: ${response.status}`);
-                }
-
+                // Пытаемся найти файл database.json
+                const response = await fetch('database.json');
+                if (!response.ok) throw new Error("Database not found");
                 allScripts = await response.json();
                 renderScripts(allScripts);
-
             } catch (error) {
-                grid.style.display = 'none';
-                errorBox.style.display = 'block';
-                errorBox.innerHTML = `
-                    <h3>Не удалось загрузить скрипты</h3>
-                    <p>${error.message}</p>
-                    <br>
-                    <small>Если вы открыли файл просто в браузере (file://), то это не сработает из-за защиты браузера.</small>
-                    <small>Используйте локальный сервер (Live Server) или загрузите сайт на GitHub Pages/хостинг.</small>
-                `;
+                console.error(error);
+                // Если файла нет или ошибка - показываем Not Found
+                renderErrorState();
             }
         }
 
-        // 2. Отрисовка карточек
-        function renderScripts(scripts) {
-            const grid = document.getElementById('grid');
+        // 2. Рендеринг (Отрисовка)
+        function renderScripts(data) {
+            const grid = document.getElementById('scriptGrid');
             grid.innerHTML = '';
 
-            if (scripts.length === 0) {
-                grid.innerHTML = '<div style="color: var(--text-muted)">Ничего не найдено</div>';
+            if (data.length === 0) {
+                renderErrorState();
                 return;
             }
 
-            scripts.forEach(script => {
+            data.forEach(script => {
+                // Если нет картинки, ставим заглушку
+                const bgStyle = script.image 
+                    ? `background-image: url('${script.image}')` 
+                    : `background: linear-gradient(45deg, #2a2c35, #1f2128)`;
+
                 const card = document.createElement('div');
                 card.className = 'card';
                 card.innerHTML = `
-                    <div class="card-top">
-                        <span class="game-label">${script.game}</span>
+                    <div class="card-img" style="${bgStyle}">
+                        ${!script.image ? '<i class="fas fa-gamepad fa-2x"></i>' : ''}
                     </div>
-                    <h3>${script.title}</h3>
-                    <p>${script.desc}</p>
-                    <button class="btn" onclick="openScript(${script.id})">
-                        <i class="fas fa-code"></i> Показать код
-                    </button>
+                    <div class="card-body">
+                        <div class="game-tag">${script.game}</div>
+                        <div class="card-title">${script.title}</div>
+                        <div class="card-meta">
+                            <span class="meta-info">${script.date || 'Recently'}</span>
+                            <button class="btn-copy" onclick="copyToClipboard('${escapeStr(script.code)}')">
+                                Copy Script
+                            </button>
+                        </div>
+                    </div>
                 `;
                 grid.appendChild(card);
             });
         }
 
-        // 3. Поиск
-        document.getElementById('searchInput').addEventListener('input', (e) => {
+        // 3. Состояние "Не найдено" (как просил)
+        function renderErrorState() {
+            const grid = document.getElementById('scriptGrid');
+            grid.innerHTML = `
+                <div class="not-found">
+                    <i class="fas fa-box-open"></i>
+                    <h2>Scripts not found</h2>
+                    <p>Try changing your search query.</p>
+                </div>
+            `;
+        }
+
+        // 4. Поиск и Фильтрация
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', (e) => {
             const val = e.target.value.toLowerCase();
-            const filtered = allScripts.filter(s => 
-                s.title.toLowerCase().includes(val) || 
-                s.game.toLowerCase().includes(val)
-            );
+            const filtered = allScripts.filter(s => {
+                const matchesSearch = s.title.toLowerCase().includes(val) || s.game.toLowerCase().includes(val);
+                const matchesType = currentFilter === 'all' || s.type === currentFilter;
+                return matchesSearch && matchesType;
+            });
             renderScripts(filtered);
         });
 
-        // 4. Модальное окно
-        const modal = document.getElementById('modalOverlay');
-        const modalCode = document.getElementById('modalCode');
-        const modalTitle = document.getElementById('modalTitle');
-
-        window.openScript = (id) => {
-            const script = allScripts.find(s => s.id === id);
-            if (!script) return;
-
-            modalTitle.textContent = script.title;
-            modalCode.textContent = script.code;
+        function filterType(type, btn) {
+            currentFilter = type;
             
-            modal.classList.add('active');
-            Prism.highlightElement(modalCode); // Подсветка кода
-        };
+            // UI кнопок
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
 
-        // Закрытие модалки
-        document.getElementById('closeModal').addEventListener('click', () => modal.classList.remove('active'));
-        modal.addEventListener('click', (e) => {
-            if (e.target === modal) modal.classList.remove('active');
-        });
+            // Trigger search update to re-render
+            searchInput.dispatchEvent(new Event('input'));
+        }
 
-        // Копирование
-        document.getElementById('copyBtn').addEventListener('click', function() {
-            navigator.clipboard.writeText(modalCode.textContent).then(() => {
-                const originalText = this.innerHTML;
-                this.innerHTML = '<i class="fas fa-check"></i> Скопировано';
-                setTimeout(() => {
-                    this.innerHTML = originalText;
-                }, 2000);
+        // 5. Копирование
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                const toast = document.getElementById('toast');
+                toast.classList.add('show');
+                setTimeout(() => toast.classList.remove('show'), 2000);
             });
-        });
+        }
 
-        // Запуск при загрузке
-        fetchScripts();
+        // Вспомогательная функция для экранирования кавычек в коде
+        function escapeStr(str) {
+            return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+        }
+
+        // Старт
+        loadScripts();
     </script>
 </body>
 </html>
